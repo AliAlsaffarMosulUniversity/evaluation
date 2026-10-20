@@ -12,9 +12,9 @@ service cloud.firestore {
     // معرّف الإرسال والتقييم = رقم صاحب الاستمارة _ رقم الاستمارة
     function mine(id) { return id.matches(request.auth.uid + '_.*'); }
     function subPath(id) { return /databases/$(database)/documents/subs/$(id); }
-    function isSup(u, f) {
-      return exists(subPath(u + '_' + f)) && get(subPath(u + '_' + f)).data.sup == me();
-    }
+    // جهات التقييم: المسؤول المباشر (sup) ورئيس اللجنة العلمية (com)
+    function ev(id) { return exists(subPath(id)) && get(subPath(id)).data.sup == me(); }
+    function isSup(u, f) { return ev(u + '_' + f + '_sup') || ev(u + '_' + f + '_com'); }
 
     // استمارات التدريسي ووثائقها: يراها صاحبها، والمسؤول الذي أُرسلت إليه
     match /users/{u}/forms/{f} {
@@ -26,7 +26,7 @@ service cloud.firestore {
       }
     }
 
-    // الإرسال إلى المسؤول المباشر
+    // الإرسال التلقائي إلى جهات التقييم
     match /subs/{id} {
       allow read: if ok() && (mine(id) || resource.data.sup == me());
       allow create, update: if ok() && mine(id)
@@ -37,7 +37,7 @@ service cloud.firestore {
       allow delete: if ok() && mine(id);
     }
 
-    // تقييم المسؤول: يكتبه المسؤول وحده، ويقرؤه التدريسي
+    // التقييم: تكتبه جهة التقييم وحدها، ويقرؤه التدريسي
     match /reviews/{id} {
       allow read: if ok() && (mine(id) || (exists(subPath(id)) && get(subPath(id)).data.sup == me()));
       allow write: if ok() && !mine(id) && exists(subPath(id)) && get(subPath(id)).data.sup == me();
