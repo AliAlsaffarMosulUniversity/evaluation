@@ -56,6 +56,8 @@ nav .n{font-size:.8rem;font-variant-numeric:tabular-nums;white-space:nowrap}
 .sheet{background:var(--paper);border:1px solid var(--line);border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.08);padding:22px 22px 26px;min-width:0}
 .ohead{font-weight:700;display:flex;justify-content:space-between;gap:16px;font-size:.95rem;line-height:1.5}
 .ohead div:first-child{text-align:center}
+.ofno{display:flex;flex-direction:column;gap:6px;min-width:220px}
+.ofno .dot{min-width:90px}
 .otitle{border:1.5px solid var(--line);border-radius:22px;text-align:center;padding:8px 14px;margin:14px 0}
 .otitle h1{font-size:1.25rem;margin:0;line-height:1.5}
 .otitle p{font-size:.82rem;margin:4px 0 0}
@@ -295,7 +297,7 @@ let S={info:{},prev:[{},{},{}],v:{},files:{},noTeach:false};
 let cur='info',db=null,assets=null,downloads=null,sample=null,docRef=null,uid=null,isAdmin=false;
 let myReview=null,sentAt=null,people=null,supSel=null,R=null,Q=[];
 const tmpBlob={};
-function secs(){const s=[{id:'info',t:'البيانات الرئيسة'},{id:'smart',t:'الرفع والفرز'},...AX.map(a=>({id:a.id,t:a.t,ax:a})),
+function secs(){const s=[{id:'info',t:'البيانات الرئيسة'},...AX.map(a=>({id:a.id,t:a.t,ax:a})),
   {id:'docs',t:'الوثائق المرفوعة'},{id:'tips',t:'نصائح لرفع الدرجة'},{id:'res',t:'النتائج النهائية'}];
   if(isAdmin)s.push({id:'sup',t:'لوحة المسؤول'});return s}
 function loadLocal(){try{const r=localStorage.getItem(LS);if(r)merge(JSON.parse(r))}catch(e){}}
@@ -380,7 +382,9 @@ function footer(){const L=secs(),i=L.findIndex(s=>s.id===cur);
     i<L.length-1?h('button',{class:'btn',type:'button',onclick:()=>go(L[i+1].id)},'التالي: '+L[i+1].t):h('span'))}
 function ohead(){return[h('div',{class:'ohead'},
     h('div',null,'وزارة التعليم العالي والبحث العلمي',h('br'),'جهاز الإشراف والتقويم العلمي',h('br'),'دائرة ضمان الجودة والاعتماد الأكاديمي',h('br'),'قسم تقويم الأداء المؤسسي'),
-    h('div',null,'رقم الاستمارة:',h('br'),'ترميز الاستمارة:')),
+    h('div',{class:'ofno'},
+      ...[['formNo','رقم الاستمارة'],['formCode','ترميز الاستمارة']].map(([k,l])=>h('div',{class:'line',style:'margin:0'},h('span',null,l+':'),
+        h('input',{class:'dot',type:'text',value:S.info[k]||'','aria-label':l,oninput:e=>{S.info[k]=e.target.value;save()}}))))),
   h('div',{class:'otitle'},h('h1',null,'استمارة رقم (10): الملف التقويمي لأداء التدريسي الإداري في الجامعات والكليات للعام الدراسي 2025-2026'),
     h('p',null,'ملاحظة: تشمل هذه الاستمارة معاوني العمداء ورؤساء الأقسام العلمية والإدارية ومقرري الأقسام والفروع (الدراسات الأولية الصباحية والمسائية والدراسات العليا) ومسؤولي الشعب والوحدات'))]}
 
@@ -683,7 +687,7 @@ function renderDocs(){
     keys.length?h('table',{class:'form'},h('thead',null,h('tr',null,h('th',null,'الفقرة'),h('th',null,'الوثائق'))),
       h('tbody',null,keys.map(k=>h('tr',null,h('td',null,h('button',{class:'linkbtn',type:'button',onclick:()=>go(ITEMS[k]?ITEMS[k].ax.id:k,k)},keyName(k))),
         h('td',null,h('ul',{class:'files',style:'margin:0'},S.files[k].map(f=>h('li',null,fileLink(f),h('span',{class:'meta'},kb(f.size)))))))))):
-      h('p',{class:'note'},'لم ترفع أي وثيقة بعد. افتح «الرفع والفرز» أو أي فقرة واضغط «ارفع وثيقة».')];
+      h('p',{class:'note'},'لم ترفع أي وثيقة بعد. افتح أي فقرة واضغط «ارفع وثيقة».')];
 }
 
 /* ---------- النصائح ---------- */
@@ -752,7 +756,7 @@ function renderRes(){
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function officialHtml(st=S,ov){
   const T=totals(st,ov),I=st.info,d=k=>'<span class="d">'+esc(I[k])+'</span>';let b='';
-  b+='<div class="oh"><div>وزارة التعليم العالي والبحث العلمي<br>جهاز الإشراف والتقويم العلمي<br>دائرة ضمان الجودة والاعتماد الأكاديمي<br>قسم تقويم الأداء المؤسسي</div><div>رقم الاستمارة:<br>ترميز الاستمارة:</div></div>';
+  b+='<div class="oh"><div>وزارة التعليم العالي والبحث العلمي<br>جهاز الإشراف والتقويم العلمي<br>دائرة ضمان الجودة والاعتماد الأكاديمي<br>قسم تقويم الأداء المؤسسي</div><div>رقم الاستمارة: '+d('formNo')+'<br>ترميز الاستمارة: '+d('formCode')+'</div></div>';
   b+='<div class="ot"><h1>استمارة رقم (10): الملف التقويمي لأداء التدريسي الإداري في الجامعات والكليات للعام الدراسي 2025-2026</h1><p>ملاحظة: تشمل هذه الاستمارة معاوني العمداء ورؤساء الأقسام العلمية والإدارية ومقرري الأقسام والفروع (الدراسات الأولية الصباحية والمسائية والدراسات العليا) ومسؤولي الشعب والوحدات</p></div>';
   b+='<p>المؤسسة التعليمية : '+d('inst')+'</p><p>الاسم الرباعي واللقب : '+d('name')+'</p><p>محل وتاريخ الولادة : '+d('birth')+'</p><h2>البيانات الرئيسة :</h2>';
   b+='<table><tr><th>ت</th><th>الفقرات</th></tr><tr><td class="c">1</td><td>الشهادة الحاصل عليها : '+d('deg')+' تاريخ الحصول عليها : '+d('degDate')+' الجهة المانحة : '+d('degFrom')+'</td></tr>'+
