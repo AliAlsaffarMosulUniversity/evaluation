@@ -81,6 +81,8 @@ nav .n{font-size:.8rem;font-variant-numeric:tabular-nums;white-space:nowrap}
 .acct{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .acct:empty{display:none}
 .supbox{border:2px solid var(--acc)}
+.lock{background:var(--mark);border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:0 0 12px;font-size:.92rem}
+table.locked input:disabled,table.locked button:disabled{opacity:.55;cursor:not-allowed}
 .btn.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:var(--paper);color:var(--ink);border:1px solid var(--line)}
 .gbtn .glogo,.gbtn svg{width:22px;height:22px;flex:none;display:block}
 .orl{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.85rem}
@@ -353,6 +355,7 @@ function setSave(t){document.getElementById('save').textContent=t}
 const r2=n=>Math.round(n*100)/100;
 function capOf(it,st=S){return it.id==='a2i5'&&st.noTeach?100:it.cap}
 function itemScore(it,st=S){
+  if(supLock(it.ax))return 0;
   const v=st.v[it.id];let s=0;
   if(it.kind==='num')return Math.min(it.max,Math.max(0,+v||0));
   if(it.kind==='checks'){const big=it.id==='a2i5'&&st.noTeach;
@@ -393,7 +396,7 @@ function refresh(){
   document.getElementById('grade').textContent='التقدير النهائي: '+T.grade;
   document.getElementById('bar').style.width=Math.min(100,T.fin)+'%';
   document.getElementById('cap80').hidden=!T.capped;
-  document.querySelectorAll('[data-pts]').forEach(e=>{e.textContent=r2(itemScore(ITEMS[e.dataset.pts]))});
+  document.querySelectorAll('[data-pts]').forEach(e=>{e.textContent=r2(T.sc(ITEMS[e.dataset.pts]))});
   document.querySelectorAll('[data-ax]').forEach(e=>{const a=AX.find(x=>x.id===e.dataset.ax);e.textContent=(a.minus&&T.ax(a)?'− ':'')+r2(T.ax(a))});
   const m=missing().length,nd=document.querySelector('[data-docs]');if(nd)nd.textContent=m?m+' ناقصة':'';
 }
@@ -547,15 +550,17 @@ function controls(it){
   if(it.doc)b.push(uploader(it.id));
   return b;
 }
+const supLock=a=>!!(auth&&me&&a.by===SUPBY);
 function axHead(a){return h('h2',{class:'axis-title'},'المحور '+ORD[AX.indexOf(a)]+': '+a.t+(a.w?' ('+a.w+'%)':'')+' : يملأ من قبل '+a.by)}
 function renderAxis(a){
-  const out=[axHead(a),h('p',{class:'note'},a.note)];
+  const lk=supLock(a),out=[axHead(a),lk?h('div',{class:'lock'},'🔒 هذا المحور يملؤه المسؤول المباشر، فخاناته مقفلة أمامك. تصل إليه استمارتك تلقائياً ويضع درجاته، ثم تظهر هنا وتُدمج في درجتك النهائية.',
+    a.up||axItems(a).some(i=>i.doc)?' ويمكنك رفع الوثائق الداعمة ليطّلع عليها.':''):h('p',{class:'note'},a.note)];
   if(a.id==='a2')out.push(h('div',{class:'box'},h('label',{class:'chk'},
     h('input',{type:'checkbox',checked:S.noTeach,onchange:e=>{S.noTeach=e.target.checked;save();go('a2')}}),h('span',null,'التدريسي غير مكلف بمهام تدريسية'))));
   const items=axItems(a);
   if(items.every(i=>i.kind==='num')){
     out.push(h('table',{class:'form'},h('thead',null,h('tr',null,h('th',null,'ت'),h('th',null,'الفقرات (المؤشرات)'),h('th',null,'الدرجة القصوى'),h('th',null,'الدرجة المعطاة'))),
-      h('tbody',null,items.map((it,i)=>h('tr',null,h('td',{class:'c'},i+1),h('td',null,it.label),h('td',{class:'c','data-l':'الدرجة القصوى'},it.max),h('td',{class:'c','data-l':'الدرجة المعطاة'},numInput(it)))),
+      h('tbody',null,items.map((it,i)=>h('tr',{id:'it-'+it.id},h('td',{class:'c'},i+1),h('td',null,it.label),h('td',{class:'c','data-l':'الدرجة القصوى'},it.max),h('td',{class:'c','data-l':'الدرجة المعطاة'},numInput(it)))),
         h('tr',{class:'tot'},h('td'),h('td',null,'المجموع'),h('td',{class:'c','data-l':'الدرجة القصوى'},a.cap),h('td',{class:'c','data-l':'المجموع','data-ax':a.id})))),
       a.up?h('div',{class:'box'},'وثائق داعمة لهذا المحور (اختياري)',uploader(a.id)):null);
   }else{
@@ -565,6 +570,14 @@ function renderAxis(a){
           h('td',{class:'c','data-l':'الدرجة القصوى'},isFinite(capOf(it))?capOf(it):'غير محددة'),h('td',{class:'c','data-l':last,'data-pts':it.id}))),
         h('tr',{class:'tot'},h('td'),h('td',null,a.minus?'مجموع الدرجات التي تخصم':'الدرجة النهائية'),h('td'),h('td',{class:'c','data-l':'الدرجة القصوى'},isFinite(a.cap)?a.cap:''),h('td',{class:'c','data-l':'المجموع','data-ax':a.id})))));
   }
+  if(lk){const rv=(myReview&&myReview.v)||{};
+    out.forEach(el=>{if(!el||!el.querySelectorAll)return;
+      el.querySelectorAll('input,button,output').forEach(x=>{if(x.closest('.up'))return;
+        if(x.tagName==='INPUT'&&x.classList.contains('num')){const id=x.closest('tr')&&x.closest('tr').id.replace('it-','');x.value=rv[id]??'';x.placeholder='—'}
+        if(x.tagName==='INPUT'&&x.type==='checkbox')x.checked=false;
+        if(x.tagName==='OUTPUT')x.textContent='0';
+        x.disabled=true});
+      if(el.classList&&el.classList.contains('form'))el.classList.add('locked')})}
   return out;
 }
 function renderInfo(){
@@ -724,7 +737,7 @@ function renderDocs(){
 /* ---------- النصائح ---------- */
 function renderTips(){
   const T=totals(),tips=[];
-  for(const a of AX){if(a.minus)continue;const wt=a.w?a.w/100:1,axRoom=a.cap-T.ax(a);if(axRoom<=0)continue;
+  for(const a of AX){if(a.minus||supLock(a))continue;const wt=a.w?a.w/100:1,axRoom=a.cap-T.ax(a);if(axRoom<=0)continue;
     for(const it of axItems(a)){if(it.kind==='num')continue;const room=Math.min(capOf(it)-itemScore(it),axRoom);if(room<=0)continue;
       let how='';const v=S.v[it.id]||{};
       if(it.kind==='tally'){const o=[...it.opts].sort((x,y)=>Math.min(y.pts,room)-Math.min(x.pts,room)||x.pts-y.pts)[0];how='مثال: '+o.label+' (+'+Math.min(o.pts,room)+' في الفقرة)'}
@@ -1058,7 +1071,7 @@ function renderSup(){
   const out=[h('button',{class:'btn ghost sm',type:'button',onclick:()=>{supSel=null;render()}},'رجوع إلى القائمة'),
     h('h2',{class:'axis-title',style:'margin-top:10px'},p.name),
     h('p',{class:'note'},[['inst','المؤسسة'],['title','اللقب العلمي'],['pos','المنصب'],['exact','الاختصاص الدقيق']].filter(x=>st.info[x[0]]).map(x=>x[1]+': '+st.info[x[0]]).join('. ')),
-    h('p',{class:'note'},'تضع درجاتك في محاور المسؤول المباشر فقط. الخانة الفارغة تعني اعتماد درجة التدريسي كما هي. محاور اللجنة العلمية تبقى بدرجة التدريسي. اضغط اسم الوثيقة لعرضها.'),
+    h('p',{class:'note'},'تضع درجاتك في محاور المسؤول المباشر فقط، وهي مقفلة أمام التدريسي فلا يملؤها. الخانة الفارغة تُحسب صفراً. محاور اللجنة العلمية تبقى بتقدير التدريسي. اضغط اسم الوثيقة لعرضها.'),
     h('div',{class:'qrow',style:'margin-bottom:10px'},h('button',{class:'btn ghost sm',type:'button',onclick:()=>{R.v={};render()}},'افرغ درجاتي'),
       (st.files.info||[]).length?h('span',null,'وثائق البيانات: ',st.files.info.map(f=>[fileLink(f),' '])):null)];
   AX.forEach(a=>{out.push(axHead(a),h('table',{class:'form'},
