@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>استمارة التقييم رقم 10 | الملف التقويمي لأداء التدريسي الإداري</title>
 <meta name="description" content="مساعد ملء استمارة رقم 10: الملف التقويمي لأداء التدريسي الإداري في الجامعات والكليات العراقية للعام الدراسي 2025-2026، مع حساب الدرجة ورفع الوثائق.">
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Reem+Kufi:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --desk:#E6ECEA; --paper:#FAFBF8; --ink:#2A3638; --line:#9DB0AC; --hd:#DDE9E5; --muted:#5F7170; --err:#B3412F; --ok:#2E7D5B; --mark:#FBF2D2; --acc:#2F6F6A; --onacc:#FFFFFF;
@@ -59,25 +62,86 @@ nav .n{font-size:.8rem;font-variant-numeric:tabular-nums;white-space:nowrap}
 .ohead div:first-child{text-align:center}
 .ofno{display:flex;flex-direction:column;gap:6px;min-width:220px}
 .ofno .dot{min-width:90px}
-.gate{min-height:100vh;padding:18px 14px 60px}
-.gwrap{max-width:1000px;margin:0 auto}
-.gcard{max-width:460px;margin:6vh auto 0;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:22px 22px 18px;box-shadow:0 1px 6px rgba(0,0,0,.08);display:grid;gap:10px}
-.gcard h1{font-size:1.3rem;margin:0}
-.gform{display:grid;gap:10px}
-.gfl{display:grid;gap:3px;font-weight:700;font-size:.92rem}
+.gate{--slate:#13252D;--slate2:#1B3440;--uo:#D4561C;--uo2:#B9461A;--sky:#0E9BD5;--canvas:#EEF2F3;--card:#FFFFFF;--tx:#1D2A2F;--mu:#5E6E73;--ln:#D5DEE0;
+  min-height:100vh;background:var(--canvas);color:var(--tx);font-family:"IBM Plex Sans Arabic",Tahoma,sans-serif;line-height:1.75}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .gate{--canvas:#0F1A1F;--card:#17262D;--tx:#E3ECEE;--mu:#9DB0B4;--ln:#2C4049}}
+:root[data-theme="dark"] .gate{--canvas:#0F1A1F;--card:#17262D;--tx:#E3ECEE;--mu:#9DB0B4;--ln:#2C4049}
+.gate h1,.gate h2,.kufi{font-family:"Reem Kufi","IBM Plex Sans Arabic",sans-serif;font-weight:700;letter-spacing:0}
+.gate .btn{font-family:inherit;border-radius:10px;padding:10px 18px;font-size:1rem;background:var(--uo);border-color:var(--uo);color:#fff}
+.gate .btn:hover{background:var(--uo2);border-color:var(--uo2)}
+.gate .btn.ghost{background:transparent;color:var(--tx);border-color:var(--ln)}
+.gate .btn.ghost:hover{background:rgba(127,127,127,.08)}
+.gate .btn.sm{padding:6px 14px;font-size:.92rem}
+.gate .linkbtn{color:var(--sky);font-family:inherit}
+.gate .note{color:var(--mu)}
+.gate .txt{width:100%;font:inherit;padding:11px 14px;border:1px solid var(--ln);border-radius:10px;background:var(--card);color:var(--tx)}
+.gate .txt:focus{outline:none;border-color:var(--sky);box-shadow:0 0 0 3px rgba(14,155,213,.2)}
+.gate .err{min-height:1.2em}
+/* sign-in screens */
+.auth{min-height:100vh;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}
+.hero{position:relative;overflow:hidden;background:var(--slate);color:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:48px 32px}
+.hero .arch{position:absolute;inset:auto;width:min(560px,92%);height:auto;top:50%;left:50%;transform:translate(-50%,-56%);pointer-events:none}
+.hero .seal{position:relative;width:150px;height:150px;border-radius:50%;background:#fff;padding:6px;box-shadow:0 0 0 6px rgba(255,255,255,.08),0 18px 40px rgba(0,0,0,.35)}
+.hero .seal img{width:100%;height:100%;display:block}
+.hero h1{position:relative;font-size:clamp(1.7rem,3.2vw,2.6rem);line-height:1.35;margin:28px 0 8px;max-width:14em}
+.hero .sub{position:relative;font-size:1.05rem;color:#C9D7DB;margin:0}
+.hero .yr{position:relative;display:inline-block;margin-top:14px;padding:4px 14px;border:1px solid rgba(255,255,255,.25);border-radius:999px;font-size:.9rem;color:#E6EEF0}
+.hero .credit{position:absolute;bottom:18px;left:0;right:0;font-size:.78rem;color:#8FA6AD}
+.apane{display:flex;align-items:center;justify-content:center;padding:40px 24px}
+.gcard{width:100%;max-width:420px;display:grid;gap:14px}
+.gcard h1{font-size:1.7rem;margin:0}
+.gform{display:grid;gap:12px}
+.gfl{display:grid;gap:5px;font-weight:600;font-size:.93rem}
 .gfl .txt{width:100%}
 .mail{font-weight:700;margin:0;overflow-wrap:anywhere}
-.glib{display:grid;gap:14px}
-.ghead{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 16px}
-.gt{font-weight:700;font-size:1.15rem}
-.gsec{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 16px 16px}
-.gsec h2{font-size:1.05rem;margin:0 0 10px}
-.gsec.inbox{border:2px solid var(--acc)}
-.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
-.fcard{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:6px;align-content:start;opacity:.86}
-.fcard.on{opacity:1;border:2px solid var(--acc);background:var(--hd)}
-.fno{font-weight:700;color:var(--acc);font-size:.9rem}
-.ft{font-weight:700;line-height:1.6}
+.gate .btn.gbtn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;background:var(--card);color:var(--tx);border:1px solid var(--ln);padding:12px 18px;font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.gate .btn.gbtn:hover{border-color:var(--sky);background:var(--card)}
+.gbtn .glogo,.gbtn svg{width:22px;height:22px;flex:none;display:block}
+.gform .btn[type=submit]{width:100%}
+.orl{display:flex;align-items:center;gap:12px;color:var(--mu);font-size:.85rem}
+.orl::before,.orl::after{content:"";flex:1;border-top:1px solid var(--ln)}
+.alinks{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;font-size:.93rem}
+/* forms library */
+.band{background:var(--slate);color:#fff;position:relative;overflow:hidden}
+.band .in{max-width:1080px;margin:0 auto;padding:22px 20px 70px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.band .seal{width:64px;height:64px;border-radius:50%;background:#fff;padding:3px;flex:none}
+.band .seal img{width:100%;height:100%;display:block}
+.band .ttl{flex:1;min-width:200px}
+.band .ttl h1{font-size:clamp(1.25rem,2.4vw,1.7rem);margin:0;line-height:1.4}
+.band .ttl div{color:#BFD0D5;font-size:.92rem}
+.band .who{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:.9rem;color:#DCE7EA}
+.band .who .btn.ghost{color:#fff;border-color:rgba(255,255,255,.35)}
+.band .arch{position:absolute;left:-40px;bottom:-120px;width:300px;opacity:.9;pointer-events:none}
+.glib{max-width:1080px;margin:-46px auto 0;padding:0 20px 60px;position:relative;display:grid;gap:22px}
+.intro{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:16px 20px;color:var(--mu)}
+.inbox{background:var(--card);border-radius:14px;padding:18px 20px;border:2px solid var(--sky);display:grid;gap:6px}
+.inbox h2{margin:0;font-size:1.2rem}
+.gsec h2{font-size:1.25rem;margin:0 0 12px;display:flex;align-items:center;gap:10px}
+.gsec h2::before{content:"";width:6px;height:22px;border-radius:3px;background:var(--uo)}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.fcard{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:14px 16px;display:grid;gap:8px;align-content:start}
+.fcard .ft{font-weight:600;line-height:1.65}
+.fcard .fno{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:.88rem;color:var(--mu)}
+.fcard .soon{font-weight:500;font-size:.8rem;border:1px solid var(--ln);border-radius:999px;padding:1px 10px}
+.fcard.on{border:2px solid var(--uo);box-shadow:0 10px 24px rgba(212,86,28,.12)}
+.fcard.on .fno{color:var(--uo)}
+.fcard .acts{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-top:4px}
+.helpers{display:flex;flex-wrap:wrap;gap:10px}
+.helpers a{background:var(--card);border:1px solid var(--ln);border-radius:999px;padding:6px 16px;color:var(--tx);text-decoration:none;font-size:.93rem}
+.helpers a:hover{border-color:var(--sky)}
+.wait{min-height:100vh;display:grid;place-items:center;background:var(--slate);color:#fff;text-align:center}
+.wait img{width:110px;height:110px;border-radius:50%;background:#fff;padding:4px;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(.94);opacity:.8}}
+@media (prefers-reduced-motion:reduce){.wait img{animation:none}}
+@media (max-width:860px){
+  .auth{grid-template-columns:1fr;min-height:0}
+  .hero{padding:34px 20px 30px}.hero .seal{width:104px;height:104px}.hero h1{margin-top:18px}.hero .credit{position:static;margin-top:16px}
+  .hero .arch{width:340px}
+  .apane{padding:26px 16px 40px}
+  .band .in{padding:18px 16px 64px}.glib{padding:0 16px 50px}
+}
+.brand .blogo{width:34px;height:34px;border-radius:50%;background:#fff;flex:none}
+.brand>span{display:flex;align-items:center;gap:8px}
 .acct{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .acct:empty{display:none}
 .supbox{border:2px solid var(--acc)}
@@ -165,7 +229,7 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 <section id="gate" class="gate" hidden></section>
 <div class="wrap" id="app">
   <aside class="rail">
-    <div class="brand"><span>استمارة التقييم رقم 10</span>
+    <div class="brand"><span><img class="blogo" src="logo.png" alt="">استمارة التقييم رقم 10</span>
       <button type="button" id="thBtn" class="thbtn" aria-label="بدّل إلى الوضع الليلي">
         <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7 7 17M17 7l1.7-1.7"/></g></svg>
         <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.5 14.6A8.6 8.6 0 0 1 9.4 3.5a.6.6 0 0 0-.8-.7 9.8 9.8 0 1 0 12.6 12.6.6.6 0 0 0-.7-.8Z"/></svg>
@@ -905,18 +969,23 @@ function gShow(v){gateView=v;wrapEl.hidden=true;gate.hidden=false;renderGate();w
 function fld(label,attrs){const i=h('input',Object.assign({class:'txt'},attrs));return[h('label',{class:'gfl'},h('span',null,label),i),i]}
 function gMsg(){const m=h('div',{class:'err',role:'status'},gateMsg);gateMsg='';return m}
 function busy(btn,txt,fn){return async()=>{const o=btn.textContent;btn.disabled=true;btn.textContent=txt;try{await fn()}finally{btn.disabled=false;btn.textContent=o}}}
-function gCard(title,...c){return h('div',{class:'gcard'},h('h1',null,title),c)}
+const ARCH='<svg class="arch" viewBox="0 0 400 460" fill="none" aria-hidden="true"><path d="M30 460V200L110 110L200 20L290 110L370 200V460" stroke="#D4561C" stroke-width="3" opacity=".55"/><path d="M62 460V214L134 134L200 66L266 134L338 214V460" stroke="#0E9BD5" stroke-width="2" opacity=".45"/><path d="M94 460V228L158 158L200 112L242 158L306 228V460" stroke="#ffffff" stroke-width="1.5" opacity=".18"/></svg>';
+function svgEl(html){const t=document.createElement('template');t.innerHTML=html;return t.content.firstChild}
+function hero(){return h('section',{class:'hero'},svgEl(ARCH),h('div',{class:'seal'},h('img',{src:'logo.png',alt:'شعار جامعة الموصل'})),
+  h('h1',null,'منظومة استمارات تقييم الأداء'),h('p',{class:'sub'},'جامعة الموصل'),h('span',{class:'yr'},'العام الدراسي 2025-2026'),
+  h('div',{class:'credit'},'تصميم وبرمجة: م.م. علي عبد الوهاب الصفار'))}
+function gCard(title,...c){return h('div',{class:'auth'},hero(),h('div',{class:'apane'},h('div',{class:'gcard'},h('h1',null,title),c)))}
 function renderGate(){
   const v=gateView;let body;
-  if(v==='wait')body=gCard('منظومة استمارات تقييم الأداء',h('p',{class:'note'},'تُحمَّل المنظومة…'));
+  if(v==='wait')body=h('div',{class:'wait'},h('div',null,h('img',{src:'logo.png',alt:'شعار جامعة الموصل'}),h('p',{class:'kufi',style:'font-size:1.3rem;margin-top:16px'},'منظومة استمارات تقييم الأداء'),h('p',{style:'color:#C9D7DB'},'تُحمَّل المنظومة…')));
   else if(v==='login'){
     const [le,em]=fld('البريد الرسمي',{type:'email',dir:'ltr',autocomplete:'username',placeholder:'name'+DOMAIN}),[lp,pw]=fld('كلمة المرور',{type:'password',dir:'ltr',autocomplete:'current-password'});
     const msg=gMsg(),go=h('button',{class:'btn',type:'submit'},'دخول');
     const f=h('form',{class:'gform',onsubmit:e=>{e.preventDefault();busy(go,'يدخل…',async()=>{msg.textContent='';
       if(!isUom(em.value)){msg.textContent='اكتب بريدك الرسمي الذي ينتهي بـ '+DOMAIN;return}
       try{await auth.signInWithEmailAndPassword(em.value.trim(),pw.value)}catch(x){msg.textContent=aerr(x)}})()}},le,lp,go,msg);
-    body=gCard('منظومة استمارات تقييم الأداء',h('p',{class:'note'},'جامعة الموصل. العام الدراسي 2025-2026. ادخل بحسابك الجامعي في Google بضغطة واحدة، أو ببريدك الرسمي وكلمة مرورك.'),gBtn(msg),orLine(),f,
-      h('div',{class:'qrow'},h('button',{class:'linkbtn',type:'button',onclick:()=>gShow('register')},'ليس لديك حساب؟ أنشئ حساباً جديداً'),
+    body=gCard('تسجيل الدخول',h('p',{class:'note',style:'margin:0'},'ادخل بحسابك الجامعي في Google بضغطة واحدة، أو ببريدك الرسمي وكلمة مرورك.'),gBtn(msg),orLine(),f,
+      h('div',{class:'alinks'},h('button',{class:'linkbtn',type:'button',onclick:()=>gShow('register')},'ليس لديك حساب؟ أنشئ حساباً جديداً'),
         h('button',{class:'linkbtn',type:'button',onclick:()=>gShow('reset')},'نسيت كلمة المرور')));
   }else if(v==='register'){
     const [ln,nm]=fld('الاسم الرباعي واللقب',{type:'text',autocomplete:'name'}),[le,em]=fld('البريد الرسمي لجامعة الموصل',{type:'email',dir:'ltr',autocomplete:'username',placeholder:'name'+DOMAIN});
@@ -954,26 +1023,28 @@ function renderGate(){
       h('p',{class:'note'},'افتح الرسالة واضغط الرابط الذي فيها، ثم ارجع إلى هنا واضغط الزر. إن لم تجد الرسالة في البريد الوارد فابحث في البريد غير المرغوب فيه.'),
       h('div',{class:'qrow'},ck,rs),msg,h('button',{class:'linkbtn',type:'button',onclick:()=>auth.signOut()},'خروج'));
   }else body=renderLib();
-  gate.replaceChildren(h('div',{class:'gwrap'},body));
+  gate.replaceChildren(body);
 }
 function renderLib(){
   const nm=me&&me.displayName||'';
-  const top=h('div',{class:'ghead'},h('div',null,h('div',{class:'gt'},'منظومة استمارات تقييم الأداء 2025-2026'),
-      h('div',{class:'note',style:'margin:0'},nm?nm+' . ':'',h('span',{dir:'ltr'},me?me.email:''))),
-    h('button',{class:'btn ghost sm',type:'button',onclick:()=>{gateView='login';auth.signOut()}},'خروج'));
-  const out=[top];
+  const band=h('header',{class:'band'},svgEl(ARCH),h('div',{class:'in'},h('div',{class:'seal'},h('img',{src:'logo.png',alt:'شعار جامعة الموصل'})),
+    h('div',{class:'ttl'},h('h1',null,'منظومة استمارات تقييم الأداء'),h('div',null,'جامعة الموصل. العام الدراسي 2025-2026')),
+    h('div',{class:'who'},h('div',null,nm?h('div',{style:'font-weight:600;color:#fff'},nm):null,h('div',{dir:'ltr',style:'text-align:right'},me?me.email:'')),
+      h('button',{class:'btn ghost sm',type:'button',onclick:()=>{gateView='login';auth.signOut()}},'خروج'))));
+  const out=[];
   const mine=inbox.filter(x=>x.form===FID);
-  if(mine.length)out.push(h('div',{class:'gsec inbox'},h('h2',null,'استمارات وصلتك لتقييمها ('+mine.length+')'),
-    h('p',{class:'note'},'أرسلها إليك تدريسيون كتبوا بريدك بوصفك مسؤولهم المباشر أو رئيس لجنتهم العلمية. افتح اللوحة وضع درجات المحاور التي تخص صفتك.'),
-    h('button',{class:'btn',type:'button',onclick:()=>openForm('sup')},'افتح لوحة التقييم')));
-  out.push(h('p',{class:'note'},'اختر الاستمارة التي تخصك حسب منصبك وصفتك الوظيفية. الاستمارات المعلَّمة «قيد الإعداد» تُضاف تباعاً، ويمكنك الآن الاطلاع على نسختها الأصلية.'));
-  GROUPS.forEach(([g,gt])=>{out.push(h('div',{class:'gsec'},h('h2',null,gt),h('div',{class:'fgrid'},FORMS.filter(f=>f.g===g).map(f=>{
+  if(mine.length)out.push(h('section',{class:'inbox'},h('h2',null,'استمارات وصلتك لتقييمها ('+mine.length+')'),
+    h('p',{class:'note',style:'margin:0'},'أرسلها إليك تدريسيون كتبوا بريدك بوصفك مسؤولهم المباشر أو رئيس لجنتهم العلمية. افتح اللوحة وضع درجات المحاور التي تخص صفتك.'),
+    h('div',null,h('button',{class:'btn',type:'button',onclick:()=>openForm('sup')},'افتح لوحة التقييم'))));
+  out.push(h('p',{class:'intro'},'اختر الاستمارة التي تخصك حسب منصبك وصفتك الوظيفية. الاستمارات المعلَّمة «قيد الإعداد» تُضاف تباعاً، وتستطيع الآن الاطلاع على نسختها الأصلية.'));
+  GROUPS.forEach(([g,gt])=>{out.push(h('section',{class:'gsec'},h('h2',null,gt),h('div',{class:'fgrid'},FORMS.filter(f=>f.g===g).map(f=>{
     const st=f.id?libState[f.id]:null;
-    return h('div',{class:'fcard'+(f.id?' on':'')},h('div',{class:'fno'},'استمارة رقم ('+f.no+')'),h('div',{class:'ft'},f.t),f.w?h('div',{class:'note',style:'margin:0'},f.w):null,
-      h('div',{class:'qrow'},f.id?h('button',{class:'btn sm',type:'button',onclick:()=>openForm()},st==='sent'?'افتح استمارتك (وصلت إلى المسؤول)':st==='saved'?'أكمل استمارتك':'ابدأ الاستمارة'):h('span',{class:'chip'},'قيد الإعداد'),
+    return h('article',{class:'fcard'+(f.id?' on':'')},h('div',{class:'fno'},h('span',null,'استمارة رقم ('+f.no+')'),f.id?null:h('span',{class:'soon'},'قيد الإعداد')),
+      h('div',{class:'ft'},f.t),f.w?h('div',{class:'note',style:'margin:0;font-size:.88rem'},f.w):null,
+      h('div',{class:'acts'},f.id?h('button',{class:'btn sm',type:'button',onclick:()=>openForm()},st==='sent'?'افتح استمارتك (وصلت إلى المقيّمين)':st==='saved'?'أكمل استمارتك':'ابدأ الاستمارة'):h('span'),
         h('a',{class:'linkbtn',href:DRV+f.pdf+'/view',target:'_blank',rel:'noopener'},'الاستمارة الأصلية')))}))))});
-  out.push(h('div',{class:'gsec'},h('h2',null,'وثائق ونماذج مساعدة'),h('ul',{class:'files'},HELPERS.map(([t,id])=>h('li',null,h('a',{class:'linkbtn',href:DRV+id+'/view',target:'_blank',rel:'noopener'},t))))));
-  return h('div',{class:'glib'},out);
+  out.push(h('section',{class:'gsec'},h('h2',null,'وثائق ونماذج مساعدة'),h('div',{class:'helpers'},HELPERS.map(([t,id])=>h('a',{href:DRV+id+'/view',target:'_blank',rel:'noopener'},t)))));
+  return h('div',null,band,h('main',{class:'glib'},out));
 }
 async function openForm(sec){
   gate.hidden=true;wrapEl.hidden=false;setSave('تُحمَّل استمارتك…');
