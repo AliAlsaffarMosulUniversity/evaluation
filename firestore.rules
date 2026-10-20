@@ -1,0 +1,51 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // حساب مؤكَّد ببريد جامعة الموصل الرسمي فقط
+    function ok() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email.lower().matches('.*@uomosul[.]edu[.]iq');
+    }
+    function me() { return request.auth.token.email.lower(); }
+    // معرّف الإرسال والتقييم = رقم صاحب الاستمارة _ رقم الاستمارة
+    function mine(id) { return id.matches(request.auth.uid + '_.*'); }
+    function subPath(id) { return /databases/$(database)/documents/subs/$(id); }
+    function isSup(u, f) {
+      return exists(subPath(u + '_' + f)) && get(subPath(u + '_' + f)).data.sup == me();
+    }
+
+    // استمارات التدريسي ووثائقها: يراها صاحبها، والمسؤول الذي أُرسلت إليه
+    match /users/{u}/forms/{f} {
+      allow read: if ok() && (request.auth.uid == u || isSup(u, f));
+      allow write: if ok() && request.auth.uid == u;
+      match /f/{c} {
+        allow read: if ok() && (request.auth.uid == u || isSup(u, f));
+        allow write: if ok() && request.auth.uid == u;
+      }
+    }
+
+    // الإرسال إلى المسؤول المباشر
+    match /subs/{id} {
+      allow read: if ok() && (mine(id) || resource.data.sup == me());
+      allow create, update: if ok() && mine(id)
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.sup is string
+        && request.resource.data.sup.matches('.*@uomosul[.]edu[.]iq')
+        && request.resource.data.sup != me();
+      allow delete: if ok() && mine(id);
+    }
+
+    // تقييم المسؤول: يكتبه المسؤول وحده، ويقرؤه التدريسي
+    match /reviews/{id} {
+      allow read: if ok() && (mine(id) || (exists(subPath(id)) && get(subPath(id)).data.sup == me()));
+      allow write: if ok() && !mine(id) && exists(subPath(id)) && get(subPath(id)).data.sup == me();
+    }
+
+    // أي مسار آخر مغلق
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

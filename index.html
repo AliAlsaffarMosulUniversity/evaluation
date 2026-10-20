@@ -17,6 +17,7 @@
   --desk:#141A1B; --paper:#1D2526; --ink:#DCE5E3; --line:#4C605E; --hd:#283938; --muted:#9BAEAB; --err:#F09A8A; --ok:#84CFA8; --mark:#40391C; --acc:#7CC3BB; --onacc:#10201F;
 }
 *,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none!important}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--desk);color:var(--ink);font-family:Arial,"Simplified Arabic","Traditional Arabic",Tahoma,sans-serif;font-size:16px;line-height:1.8;font-weight:400}
 button,input,select{font:inherit;color:inherit}
@@ -58,6 +59,28 @@ nav .n{font-size:.8rem;font-variant-numeric:tabular-nums;white-space:nowrap}
 .ohead div:first-child{text-align:center}
 .ofno{display:flex;flex-direction:column;gap:6px;min-width:220px}
 .ofno .dot{min-width:90px}
+.gate{min-height:100vh;padding:18px 14px 60px}
+.gwrap{max-width:1000px;margin:0 auto}
+.gcard{max-width:460px;margin:6vh auto 0;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:22px 22px 18px;box-shadow:0 1px 6px rgba(0,0,0,.08);display:grid;gap:10px}
+.gcard h1{font-size:1.3rem;margin:0}
+.gform{display:grid;gap:10px}
+.gfl{display:grid;gap:3px;font-weight:700;font-size:.92rem}
+.gfl .txt{width:100%}
+.mail{font-weight:700;margin:0;overflow-wrap:anywhere}
+.glib{display:grid;gap:14px}
+.ghead{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 16px}
+.gt{font-weight:700;font-size:1.15rem}
+.gsec{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 16px 16px}
+.gsec h2{font-size:1.05rem;margin:0 0 10px}
+.gsec.inbox{border:2px solid var(--acc)}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.fcard{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:6px;align-content:start;opacity:.86}
+.fcard.on{opacity:1;border:2px solid var(--acc);background:var(--hd)}
+.fno{font-weight:700;color:var(--acc);font-size:.9rem}
+.ft{font-weight:700;line-height:1.6}
+.acct{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.acct:empty{display:none}
+.supbox{border:2px solid var(--acc)}
 .otitle{border:1.5px solid var(--line);border-radius:22px;text-align:center;padding:8px 14px;margin:14px 0}
 .otitle h1{font-size:1.25rem;margin:0;line-height:1.5}
 .otitle p{font-size:.82rem;margin:4px 0 0}
@@ -132,7 +155,8 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 </style>
 </head>
 <body>
-<div class="wrap">
+<section id="gate" class="gate" hidden></section>
+<div class="wrap" id="app">
   <aside class="rail">
     <div class="brand"><span>استمارة التقييم رقم 10</span>
       <button type="button" id="thBtn" class="thbtn" aria-label="بدّل إلى الوضع الليلي">
@@ -151,11 +175,13 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
       <div class="warn" id="cap80" hidden>درجة (المحور الثالث/1) صفر، فلا تتجاوز الدرجة النهائية 80.</div>
       <div class="save" id="save"></div>
     </div>
+    <div class="acct" id="acct"></div>
     <nav id="nav" aria-label="أقسام الاستمارة"></nav>
   </aside>
   <main class="sheet" id="main"></main>
 </div>
 <dialog id="dlg"><div class="dlg-head"><span id="dlgT"></span><span class="qrow"><button class="btn ghost" id="dlgDl" type="button">نزّل الملف</button><button class="btn" id="dlgX" type="button">أغلق</button></span></div><div id="dlgB"></div></dialog>
+<script src="config.js"></script>
 <script>
 "use strict";
 
@@ -292,7 +318,7 @@ const ITEMS={};AX.forEach(a=>a.items.forEach(i=>{ITEMS[i.id]=i;i.ax=a}));
 
 /* ---------- الحالة ---------- */
 const ORD=['الأول','الثاني','الثالث','الرابع','الخامس','السادس','السابع'];
-const LS='form10-state-v1';
+const LEGACY='form10-state-v1';let LS=LEGACY;
 let S={info:{},prev:[{},{},{}],v:{},files:{},noTeach:false};
 let cur='info',db=null,assets=null,downloads=null,sample=null,docRef=null,uid=null,isAdmin=false;
 let myReview=null,sentAt=null,people=null,supSel=null,R=null,Q=[];
@@ -313,7 +339,7 @@ async function flush(){
   if(!docRef){setSave(local?'تم الحفظ على هذا الجهاز':'تعذّر الحفظ. بياناتك تبقى ما دامت الصفحة مفتوحة');return}
   if(writing){dirty=true;return}
   writing=true;
-  try{await docRef.set(snap);setSave('تم الحفظ في حسابك')}
+  try{await docRef.set(snap);setSave('تم الحفظ في حسابك');autoSub()}
   catch(e){setSave(local?'تعذّر الحفظ في الحساب. محفوظ على هذا المتصفح':'تعذّر الحفظ')}
   writing=false;if(dirty){dirty=false;flush()}
 }
@@ -358,7 +384,7 @@ const main=document.getElementById('main');
 const fmtD=t=>new Date(t).toLocaleDateString('en-GB');
 const mob=()=>matchMedia('(max-width:860px)').matches;
 function refresh(){
-  const T=totals();
+  const T=totals(S,myReview&&myReview.v);
   document.getElementById('fin').textContent=r2(T.fin);
   document.getElementById('grade').textContent='التقدير النهائي: '+T.grade;
   document.getElementById('bar').style.width=Math.min(100,T.fin)+'%';
@@ -397,7 +423,7 @@ const localAssets={upload:async b=>{const id='a'+Date.now().toString(36)+Math.ra
 const localDownloads={save:async({filename,data})=>{const b=data instanceof Blob?data:new Blob([data],{type:/\.html$/.test(filename)?'text/html;charset=utf-8':'application/octet-stream'});
   const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000);return{status:'saved'}}};
 const OKT=['application/pdf','image/png','image/jpeg','image/gif','image/webp'];
-const DBMAX=3*1048576,CH=180000;
+const DBMAX=3*1048576,CH=700000;
 const kb=n=>n>1048576?r2(n/1048576)+' م.ب':Math.max(1,Math.round(n/1024))+' ك.ب';
 const cBlob=(c,q=.85)=>new Promise(r=>c.toBlob(r,'image/jpeg',q));
 async function toJpeg(blob,max){const bmp=await createImageBitmap(blob);const k=Math.min(1,max/Math.max(bmp.width,bmp.height));
@@ -418,21 +444,22 @@ async function storeFile(file){
     if(file.type!=='application/pdf'&&file.size>400000){try{blob=await toJpeg(file,1800);rec.type='image/jpeg';rec.name=file.name.replace(/\.[^.]+$/,'')+'.jpg';rec.size=blob.size}catch(e){blob=file}}
     if(blob.size>DBMAX)throw M('الملف «'+file.name+'» أكبر من 3 م.ب، وهو الحد المتاح في حسابك. صغّره ثم ارفعه.');
     const s=b64(await blob.arrayBuffer()),fid='f'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),n=Math.ceil(s.length/CH);
-    try{for(let i=0;i<n;i++)await db.doc('people/'+uid+'/f/'+fid+'_'+i).set({d:s.slice(i*CH,(i+1)*CH)})}
-    catch(e){throw M(e&&e.code==='quota_exceeded'?'امتلأت مساحة التخزين. احذف ملفات قديمة ثم أعد الرفع.':'تعذّر رفع «'+file.name+'». تأكد أن صلاحيتك «مساهم» ثم أعد المحاولة.')}
-    rec.dbid=fid;rec.n=n;rec.u=uid;return rec;
+    const pre='users/'+uid+'/forms/'+FID+'/f/'+fid;
+    try{for(let i=0;i<n;i++)await db.doc(pre+'_'+i).set({d:s.slice(i*CH,(i+1)*CH)})}
+    catch(e){throw M(e&&e.code==='resource-exhausted'?'امتلأت مساحة التخزين في المنظومة. أخبر مسؤول المنظومة.':'تعذّر رفع «'+file.name+'». تأكد من الإنترنت ثم أعد المحاولة.')}
+    rec.dbid=fid;rec.n=n;rec.u=uid;rec.p=pre;return rec;
   }
   rec.t='t'+Date.now()+Math.random();tmpBlob[rec.t]=file;return rec;
 }
 async function loadBlob(f){
   if(f.t)return tmpBlob[f.t];
   if(f.id){const b=await IDB.tx('readonly',s=>s.get(f.id));if(!b)throw new Error('gone');return b}
-  let s='';for(let i=0;i<f.n;i++){const d=await db.doc('people/'+f.u+'/f/'+f.dbid+'_'+i).get();if(!d.exists)throw new Error('gone');s+=d.data().d}
+  const pre=f.p||('people/'+f.u+'/f/'+f.dbid);let s='';for(let i=0;i<f.n;i++){const d=await db.doc(pre+'_'+i).get();if(!d.exists)throw new Error('gone');s+=d.data().d}
   const bin=atob(s),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new Blob([u],{type:f.type});
 }
 async function removeFile(f){
   if(f.id&&assets)await assets.delete(f.id);
-  if(f.dbid&&db)for(let i=0;i<f.n;i++)await db.doc('people/'+f.u+'/f/'+f.dbid+'_'+i).delete();
+  if(f.dbid&&db)for(let i=0;i<f.n;i++)await db.doc((f.p||('people/'+f.u+'/f/'+f.dbid))+'_'+i).delete();
   if(f.t)delete tmpBlob[f.t];
 }
 function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('script'));document.head.append(s)})}
@@ -540,7 +567,7 @@ function renderInfo(){
   const f=(k,l)=>[h('span',null,l+' :'),h('input',{class:'dot',type:'text',value:S.info[k]||'','aria-label':l,dir:(k==='email'||k==='mobile')?'ltr':null,oninput:e=>{S.info[k]=e.target.value;save()}})];
   const pf=(i,k,l)=>h('td',{'data-l':l},h('input',{class:'dot',style:'width:100%;min-width:60px',type:'text',value:S.prev[i][k]||'','aria-label':l,oninput:e=>{S.prev[i][k]=e.target.value;save()}}));
   const row=(n,...p)=>h('tr',null,h('td',{class:'c'},n),h('td',null,h('div',{class:'line',style:'margin:0'},p)));
-  return [ohead(),
+  return [ohead(),supBox(),
     h('div',{class:'line'},f('inst','المؤسسة التعليمية')),h('div',{class:'line'},f('name','الاسم الرباعي واللقب')),h('div',{class:'line'},f('birth','محل وتاريخ الولادة')),
     h('h2',{class:'axis-title'},'البيانات الرئيسة :'),
     h('table',{class:'form'},h('thead',null,h('tr',null,h('th',null,'ت'),h('th',null,'الفقرات'))),h('tbody',null,
@@ -734,7 +761,8 @@ async function saveHtml(name,html,msg){msg.style.color='';msg.textContent='';
 function renderRes(){
   const T=totals(),msg=h('div',{class:'err',role:'status'}),smsg=h('div',{class:'err',role:'status'});
   const out=[h('h2',{class:'axis-title'},'النتائج النهائية للتقييم:'),
-    h('p',{class:'note'},'هذه درجة متوقعة من تقديرك الذاتي. الدرجة الرسمية يضعها المسؤول المباشر واللجنة العلمية.'),
+    h('p',{class:'note'},myReview?'الدرجة النهائية تشمل تقييم المسؤول المباشر لمحاوره، مع تقديرك الذاتي لمحاور اللجنة العلمية.':'هذه درجة متوقعة من تقديرك الذاتي. الدرجة الرسمية يضعها المسؤول المباشر واللجنة العلمية.'),
+    auth&&me&&docRef?sendBox():null,
     resultTable(T),h('div',null,'التقدير النهائي للتقييم'),gradeBoxes(T),
     T.capped?h('div',{class:'warn',style:'margin-bottom:12px'},'طُبّق سقف 80 لأن درجة (المحور الثالث/1) صفر.'):null];
   if(myReview){const TR=totals(S,myReview.v||{});
@@ -742,15 +770,7 @@ function renderRes(){
       myReview.note?h('div',{class:'box'},'ملاحظة المسؤول: ',h('span',{style:'font-weight:400'},myReview.note)):null)}
   out.push(h('div',{class:'box'},'الاستمارة المملوءة',
     h('p',{class:'note'},'ملف بشكل الاستمارة الأصلية، فيه بياناتك ودرجاتك وقائمة وثائقك. افتحه واطبعه على ورق A4.'),
-    downloads?h('button',{class:'btn',type:'button',onclick:()=>saveHtml('استمارة-التقييم-رقم-10.html',officialHtml(S,myReview&&myReview.v),msg)},'نزّل الاستمارة المملوءة'):null,' ',h('button',{class:'btn ghost',type:'button',onclick:()=>{const w=window.open(URL.createObjectURL(new Blob([officialHtml()],{type:'text/html;charset=utf-8'})),'_blank');if(!w)msg.textContent='منع المتصفح فتح النافذة. استعمل زر التنزيل.'}},'افتحها للطباعة'),msg),h('div',{class:'box'},'أين تُحفظ بياناتي؟',h('p',{class:'note',style:'margin:0'},'كل بياناتك ووثائقك محفوظة على هذا الجهاز وفي هذا المتصفح فقط، ولا تُرسل إلى أي خادم. إذا مسحت بيانات المتصفح تُحذف. نزّل الملف المضغوط من «الوثائق المرفوعة» ليكون نسخة احتياطية.')));
-  if(db&&uid){const sb=h('button',{class:'btn',type:'button',onclick:async()=>{smsg.style.color='';
-      if(!(S.info.name||'').trim()){smsg.textContent='اكتب اسمك في «البيانات الرئيسة» أولاً.';return}
-      sb.disabled=true;
-      try{const at=Date.now();await db.doc('people/'+uid).set({form:snapshot(),name:S.info.name.trim().slice(0,120),at});sentAt=at;smsg.style.color='var(--ok)';smsg.textContent='أُرسل ملفك إلى المسؤول.'}
-      catch(e){smsg.textContent='تعذّر الإرسال. تأكد أن صلاحيتك «مساهم» ثم أعد المحاولة.'}
-      sb.disabled=false}},sentAt?'أعد إرسال ملفي إلى المسؤول':'أرسل ملفي إلى المسؤول');
-    out.push(h('div',{class:'box'},'الإرسال إلى المسؤول المباشر',
-      h('p',{class:'note'},'يرى المسؤول بياناتك ودرجاتك ووثائقك في لوحته، ويضع درجاته. بعدها تظهر درجاته هنا.'+(sentAt?' آخر إرسال: '+fmtD(sentAt)+'.':'')),sb,smsg))}
+    downloads?h('button',{class:'btn',type:'button',onclick:()=>saveHtml('استمارة-التقييم-رقم-10.html',officialHtml(S,myReview&&myReview.v),msg)},'نزّل الاستمارة المملوءة'):null,' ',h('button',{class:'btn ghost',type:'button',onclick:()=>{const w=window.open(URL.createObjectURL(new Blob([officialHtml()],{type:'text/html;charset=utf-8'})),'_blank');if(!w)msg.textContent='منع المتصفح فتح النافذة. استعمل زر التنزيل.'}},'افتحها للطباعة'),msg),h('div',{class:'box'},'أين تُحفظ بياناتي؟',h('p',{class:'note',style:'margin:0'},auth&&me?'بياناتك ووثائقك محفوظة في حسابك، فتفتحها من أي جهاز بعد الدخول. لا يراها أحد غيرك إلا المسؤول الذي ترسل إليه استمارتك.':'كل بياناتك ووثائقك محفوظة على هذا الجهاز وفي هذا المتصفح فقط. إذا مسحت بيانات المتصفح تُحذف. نزّل الملف المضغوط من «الوثائق المرفوعة» ليكون نسخة احتياطية.')));
   return out;
 }
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -784,33 +804,244 @@ function officialHtml(st=S,ov){
   return '<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>استمارة رقم 10</title><style>@page{size:A4;margin:12mm}body{font-family:Arial,"Simplified Arabic",Tahoma,sans-serif;font-weight:700;font-size:12.5px;line-height:1.6;color:#000;max-width:190mm;margin:10px auto}h1{font-size:16px;margin:0}h2{font-size:14px;margin:14px 0 6px}p{margin:6px 0}.oh{display:flex;justify-content:space-between}.oh div:first-child{text-align:center}.ot{border:2px solid #000;border-radius:20px;text-align:center;padding:6px 12px;margin:10px 0}.ot p{font-size:11px;margin:3px 0 0}.d{display:inline-block;min-width:110px;border-bottom:1.5px dotted #000;font-weight:400;padding:0 6px}table{border-collapse:collapse;width:100%;border:2px solid #000;margin:4px 0 8px}th{background:#D9D9D9}th,td{border:1px solid #000;padding:3px 6px;vertical-align:middle}.c{text-align:center}.n{font-weight:400}.t td{background:#D9D9D9}.on{background:#000;color:#fff}.sg{display:flex;justify-content:space-between;margin-top:24px;line-height:2.4}.pb{page-break-before:always}tr{page-break-inside:avoid}@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body>'+b+'</body></html>';
 }
 
+/* ---------- المنظومة: الحسابات ومكتبة الاستمارات ---------- */
+const FB=(window.FIREBASE_CONFIG&&window.FIREBASE_CONFIG.apiKey)?window.FIREBASE_CONFIG:null;
+const DOMAIN='@uomosul.edu.iq',SUPBY='المسؤول المباشر',FID='f10';
+let auth=null,me=null,gateView='login',inbox=[],gateMsg='',libState={};
+const gate=document.getElementById('gate'),wrapEl=document.getElementById('app');
+const DRV='https://drive.google.com/file/d/';
+const GROUPS=[['t','أعضاء الهيئة التدريسية'],['s','فئات خاصة'],['l','القيادات الجامعية'],['e','الموظفون']];
+const FORMS=[
+  {no:21,g:'t',t:'تقييم أداء أعضاء الهيئة التدريسية',pdf:'1fgIsN_UG5JffBjvgO7sfP8_679a8WPEy'},
+  {no:27,g:'t',t:'الملف التقويمي لأداء التدريسيين في الأقسام الداخلية للجامعات ممن ليس لهم منصب إداري',pdf:'1rc25mmOWZPFKD5uwOwmuF4C0waWX9MEh'},
+  {no:10,g:'t',id:'f10',t:'الملف التقويمي لأداء التدريسي الإداري في الجامعات والكليات',w:'معاونو العمداء، رؤساء الأقسام العلمية والإدارية، مقررو الأقسام والفروع، مسؤولو الشعب والوحدات',pdf:'1k8I9ej0bqDnIJI62tLYqWvL_NS0VX7S0'},
+  {no:31,g:'t',t:'تقييم أداء التدريسي الباحث في المراكز والوحدات البحثية',pdf:'1MGnDLlZsMH7fGFfMWq6nRWW1uB-m0VXF'},
+  {no:30,g:'t',t:'تقييم أداء التدريسي الباحث في المراكز والوحدات البحثية والخدمية المتفرغين جزئياً',pdf:'1e0q50qSfUDUfdRcFkYW_I_vAy4B3f2J8'},
+  {no:20,g:'s',t:'تقييم أداء أعضاء الهيئة التدريسية المتفرغين جزئياً والدارسين وفق قانون 2020',pdf:'1fJP9YPJlRVpfugjR6bD0kXnAaaFod45a'},
+  {no:22,g:'s',t:'تقييم أداء التدريسي المتفرغ لأغراض البحث العلمي داخل العراق وخارجه',pdf:'10546nwCRO4JfGRxr0tr-NslSoIi70OqD'},
+  {no:24,g:'s',t:'تقييم أداء منتسبي الوزارة المنسَّبين من الوزارة وإليها (أعضاء هيئة تدريس، موظفون)',pdf:'1I-YUTq2lQC0WthFVpG9-wkO0VXcrU0uE'},
+  {no:25,g:'s',t:'تقييم أداء المشمولين بقانون رعاية ذوي الإعاقة والاحتياجات الخاصة رقم 38 لسنة 2013',pdf:'1GzgWh080SwlLNUki4XtmOm-LxRERYW1q'},
+  {no:26,g:'s',t:'تقييم أداء المكلفين بالتدريس والموظفين المعيّنين بصفة عقد والأجر اليومي (315)',pdf:'13vz3cU6DLD6s0BCnsrtbBWDHwNIlyGGM'},
+  {no:7,g:'l',t:'الملف التقويمي لأداء القيادات الجامعية العليا: رؤساء الجامعات الحكومية',pdf:'1wGMrPLKXhasEDMGZj149H1elox6pSWvj'},
+  {no:9,g:'l',t:'الملف التقويمي لأداء مساعدي رؤساء الجامعات (الحكومية والأهلية) للشؤون العلمية',pdf:'1cHLlZmz9VWiyCVoN97885OP-E5fG-5dP'},
+  {no:23,g:'l',t:'الملف التقويمي لأداء مساعدي رؤساء الجامعات (الحكومية والأهلية) للشؤون الإدارية',pdf:'1ZxmvnJ_aedTS8rdR90lAUw9jzFHhYZTt'},
+  {no:11,g:'l',t:'الملف التقويمي لأداء القيادات العليا في التعليم الأهلي (رؤساء الجامعات وعمداء الكليات الأهلية)',pdf:'1tJsuUx0ll5EyuQKj7sQFwyY3M_526Io0'},
+  {no:12,g:'l',t:'الملف التقويمي لأداء عمداء المعاهد للدراسات العليا وأعضاء المجلس العراقي للاختصاصات الطبية',pdf:'1I-PBx8z7Xgvfyc7BWq6c-JK8eKzszfXd'},
+  {no:8,g:'l',t:'الملف التقويمي لأداء رئيس المجلس العراقي للاختصاصات الطبية',pdf:'1VO1vt1R8xCvCmkGNYM07y3CjGdv46TJY'},
+  {no:37,g:'l',t:'الملف التقويمي لأداء رئيس هيئة البحث العلمي',pdf:'1vA44QWwSk0NhiKd5mCwBaQFrKoYC0ruL'},
+  {no:13,g:'l',t:'تقييم أداء مدراء المراكز والوحدات البحثية',pdf:'1F18AKz2ichn42u4NstpHti6UifXATLu9'},
+  {no:18,g:'l',t:'الملف التقويمي لأداء مدراء المراكز الخدمية',pdf:'1s4kdRTMImq8Jp6bN83BUuYGzJ5r6MTmm'},
+  {no:28,g:'e',t:'تقييم أداء موظفي وزارة التعليم العالي والبحث العلمي',pdf:'1KHg0IokDKDALTVNfpvjXdt7KZoGou4ih'},
+  {no:29,g:'e',t:'تقييم أداء الموظفين المهنيين والحرفيين في وزارة التعليم العالي والبحث العلمي',pdf:'1rNwYw0Mkd3dUDF5AmfGl4p2LZLCsFgbe'}];
+const HELPERS=[['ضوابط الملفات التقويمية لمنتسبي الوزارة','1PQtFfSbglC1dEobYBQ-k6J6s3qPp8oz3'],['نموذج التعهد الخطي','1eYkHA5AZD0sim4DbTrWMwh1Zp07nk8ug'],
+  ['تعهد بعدم تدريس مقررات نظام بولونيا','1qrW4B8IkgLMNH6umKdlz2C_f4ve2QYHr'],['نموذج الزيارة الميدانية','1_ByV_rXnXKMg4GlPxz7Z7tZdqhBw-B7d']];
+
+const AERR={'auth/email-already-in-use':'هذا البريد مسجّل مسبقاً. ادخل بكلمة مروره، أو استعمل «نسيت كلمة المرور».',
+  'auth/invalid-credential':'البريد أو كلمة المرور غير صحيحة.','auth/wrong-password':'البريد أو كلمة المرور غير صحيحة.','auth/user-not-found':'البريد أو كلمة المرور غير صحيحة.',
+  'auth/invalid-email':'اكتب البريد الرسمي بشكل صحيح.','auth/weak-password':'كلمة المرور ضعيفة. اكتب 8 أحرف أو أرقام على الأقل.',
+  'auth/too-many-requests':'محاولات كثيرة متتالية. انتظر بضع دقائق ثم أعد المحاولة.','auth/network-request-failed':'لا يوجد اتصال بالإنترنت. تأكد من الاتصال ثم أعد المحاولة.',
+  'auth/missing-password':'اكتب كلمة المرور.'};
+const aerr=e=>AERR[e&&e.code]||'حدث خطأ غير متوقع. أعد المحاولة.';
+const isUom=e=>String(e||'').trim().toLowerCase().endsWith(DOMAIN);
+const myMail=()=>me?String(me.email||'').toLowerCase():'';
+
+async function fbInit(){
+  if(!FB){gate.hidden=true;wrapEl.hidden=false;return}
+  gShow('wait');
+  const b='https://www.gstatic.com/firebasejs/10.12.2/';
+  try{await loadScript(b+'firebase-app-compat.js');await Promise.all([loadScript(b+'firebase-auth-compat.js'),loadScript(b+'firebase-firestore-compat.js')])}
+  catch(e){gateMsg='تعذّر الاتصال بالمنظومة. تأكد من الإنترنت ثم حدّث الصفحة.';gShow('login');return}
+  firebase.initializeApp(FB);auth=firebase.auth();db=firebase.firestore();
+  try{auth.languageCode='ar'}catch(e){}
+  auth.onAuthStateChanged(async u=>{
+    me=u;uid=null;inbox=[];isAdmin=false;myReview=null;people=null;supSel=null;docRef=null;
+    if(!u){gShow(gateView==='register'||gateView==='reset'?gateView:'login');return}
+    if(!isUom(u.email)){gateMsg='المنظومة لمنتسبي جامعة الموصل فقط. سجّل ببريدك الرسمي الذي ينتهي بـ '+DOMAIN;await auth.signOut();return}
+    if(!u.emailVerified){gShow('verify');return}
+    uid=u.uid;await enterLib();
+  });
+}
+async function enterLib(){
+  gShow('lib');
+  try{const q=await db.collection('subs').where('sup','==',myMail()).get();
+    inbox=q.docs.map(d=>Object.assign({id:d.id},JSON.parse(JSON.stringify(d.data()))))}catch(e){inbox=[]}
+  isAdmin=inbox.length>0;
+  try{const d=await db.doc('users/'+uid+'/forms/'+FID).get();libState[FID]=d.exists?'saved':'';
+    const s=await db.doc('subs/'+uid+'_'+FID).get();if(s.exists)libState[FID]='sent'}catch(e){}
+  if(gateView==='lib')renderGate();
+}
+function gShow(v){gateView=v;wrapEl.hidden=true;gate.hidden=false;renderGate();window.scrollTo({top:0})}
+function fld(label,attrs){const i=h('input',Object.assign({class:'txt'},attrs));return[h('label',{class:'gfl'},h('span',null,label),i),i]}
+function gMsg(){const m=h('div',{class:'err',role:'status'},gateMsg);gateMsg='';return m}
+function busy(btn,txt,fn){return async()=>{const o=btn.textContent;btn.disabled=true;btn.textContent=txt;try{await fn()}finally{btn.disabled=false;btn.textContent=o}}}
+function gCard(title,...c){return h('div',{class:'gcard'},h('h1',null,title),c)}
+function renderGate(){
+  const v=gateView;let body;
+  if(v==='wait')body=gCard('منظومة استمارات تقييم الأداء',h('p',{class:'note'},'تُحمَّل المنظومة…'));
+  else if(v==='login'){
+    const [le,em]=fld('البريد الرسمي',{type:'email',dir:'ltr',autocomplete:'username',placeholder:'name'+DOMAIN}),[lp,pw]=fld('كلمة المرور',{type:'password',dir:'ltr',autocomplete:'current-password'});
+    const msg=gMsg(),go=h('button',{class:'btn',type:'submit'},'دخول');
+    const f=h('form',{class:'gform',onsubmit:e=>{e.preventDefault();busy(go,'يدخل…',async()=>{msg.textContent='';
+      if(!isUom(em.value)){msg.textContent='اكتب بريدك الرسمي الذي ينتهي بـ '+DOMAIN;return}
+      try{await auth.signInWithEmailAndPassword(em.value.trim(),pw.value)}catch(x){msg.textContent=aerr(x)}})()}},le,lp,go,msg);
+    body=gCard('منظومة استمارات تقييم الأداء',h('p',{class:'note'},'جامعة الموصل. العام الدراسي 2025-2026. ادخل ببريدك الرسمي وكلمة مرورك.'),f,
+      h('div',{class:'qrow'},h('button',{class:'linkbtn',type:'button',onclick:()=>gShow('register')},'ليس لديك حساب؟ أنشئ حساباً جديداً'),
+        h('button',{class:'linkbtn',type:'button',onclick:()=>gShow('reset')},'نسيت كلمة المرور')));
+  }else if(v==='register'){
+    const [ln,nm]=fld('الاسم الرباعي واللقب',{type:'text',autocomplete:'name'}),[le,em]=fld('البريد الرسمي لجامعة الموصل',{type:'email',dir:'ltr',autocomplete:'username',placeholder:'name'+DOMAIN});
+    const [lp,pw]=fld('كلمة المرور (8 أحرف أو أرقام على الأقل)',{type:'password',dir:'ltr',autocomplete:'new-password'}),[lc,pc]=fld('أعد كتابة كلمة المرور',{type:'password',dir:'ltr',autocomplete:'new-password'});
+    const msg=gMsg(),go=h('button',{class:'btn',type:'submit'},'إنشاء الحساب');
+    const f=h('form',{class:'gform',onsubmit:e=>{e.preventDefault();busy(go,'يُنشأ الحساب…',async()=>{msg.textContent='';
+      if(nm.value.trim().length<5){msg.textContent='اكتب اسمك الكامل.';return}
+      if(!isUom(em.value)){msg.textContent='التسجيل بالبريد الرسمي فقط، أي البريد الذي ينتهي بـ '+DOMAIN;return}
+      if(pw.value.length<8){msg.textContent='كلمة المرور قصيرة. اكتب 8 أحرف أو أرقام على الأقل.';return}
+      if(pw.value!==pc.value){msg.textContent='كلمتا المرور غير متطابقتين.';return}
+      try{gateView='verify';const c=await auth.createUserWithEmailAndPassword(em.value.trim(),pw.value);
+        await c.user.updateProfile({displayName:nm.value.trim().slice(0,120)});
+        await c.user.sendEmailVerification({url:location.origin+location.pathname});gShow('verify')}
+      catch(x){gateView='register';msg.textContent=aerr(x)}})()}},ln,le,lp,lc,go,msg);
+    body=gCard('إنشاء حساب جديد',h('p',{class:'note'},'بعد إنشاء الحساب تصلك رسالة تأكيد على بريدك الرسمي. افتحها واضغط الرابط الذي فيها، ثم ادخل.'),f,
+      h('button',{class:'linkbtn',type:'button',onclick:()=>gShow('login')},'لديك حساب؟ ادخل'));
+  }else if(v==='reset'){
+    const [le,em]=fld('البريد الرسمي',{type:'email',dir:'ltr',autocomplete:'username',placeholder:'name'+DOMAIN});
+    const msg=gMsg(),go=h('button',{class:'btn',type:'submit'},'أرسل رابط تغيير كلمة المرور');
+    const f=h('form',{class:'gform',onsubmit:e=>{e.preventDefault();busy(go,'يُرسَل…',async()=>{msg.style.color='';msg.textContent='';
+      if(!isUom(em.value)){msg.textContent='اكتب بريدك الرسمي الذي ينتهي بـ '+DOMAIN;return}
+      try{await auth.sendPasswordResetEmail(em.value.trim(),{url:location.origin+location.pathname});msg.style.color='var(--ok)';msg.textContent='أرسلنا الرابط إلى بريدك. إن لم تجده في البريد الوارد فابحث في البريد غير المرغوب فيه.'}
+      catch(x){msg.textContent=aerr(x)}})()}},le,go,msg);
+    body=gCard('تغيير كلمة المرور',f,h('button',{class:'linkbtn',type:'button',onclick:()=>gShow('login')},'رجوع إلى الدخول'));
+  }else if(v==='verify'){
+    const msg=gMsg();
+    const ck=h('button',{class:'btn',type:'button'},'أكّدت حسابي، ادخل');
+    ck.onclick=busy(ck,'يتحقق…',async()=>{msg.style.color='';msg.textContent='';
+      try{await me.reload();me=auth.currentUser;if(me.emailVerified){await me.getIdToken(true);uid=me.uid;await enterLib()}
+        else msg.textContent='لم يُؤكَّد الحساب بعد. افتح رسالة التأكيد واضغط الرابط الذي فيها.'}catch(x){msg.textContent=aerr(x)}});
+    const rs=h('button',{class:'btn ghost',type:'button'},'أعد إرسال رسالة التأكيد');
+    rs.onclick=busy(rs,'يُرسَل…',async()=>{msg.style.color='';msg.textContent='';
+      try{await me.sendEmailVerification({url:location.origin+location.pathname});msg.style.color='var(--ok)';msg.textContent='أُرسلت رسالة جديدة.'}catch(x){msg.textContent=aerr(x)}});
+    body=gCard('أكّد بريدك الرسمي',h('p',null,'أرسلنا رسالة تأكيد إلى:'),h('p',{dir:'ltr',class:'mail'},me?me.email:''),
+      h('p',{class:'note'},'افتح الرسالة واضغط الرابط الذي فيها، ثم ارجع إلى هنا واضغط الزر. إن لم تجد الرسالة في البريد الوارد فابحث في البريد غير المرغوب فيه.'),
+      h('div',{class:'qrow'},ck,rs),msg,h('button',{class:'linkbtn',type:'button',onclick:()=>auth.signOut()},'خروج'));
+  }else body=renderLib();
+  gate.replaceChildren(h('div',{class:'gwrap'},body));
+}
+function renderLib(){
+  const nm=me&&me.displayName||'';
+  const top=h('div',{class:'ghead'},h('div',null,h('div',{class:'gt'},'منظومة استمارات تقييم الأداء 2025-2026'),
+      h('div',{class:'note',style:'margin:0'},nm?nm+' . ':'',h('span',{dir:'ltr'},me?me.email:''))),
+    h('button',{class:'btn ghost sm',type:'button',onclick:()=>{gateView='login';auth.signOut()}},'خروج'));
+  const out=[top];
+  const mine=inbox.filter(x=>x.form===FID);
+  if(mine.length)out.push(h('div',{class:'gsec inbox'},h('h2',null,'استمارات وصلتك لتقييمها ('+mine.length+')'),
+    h('p',{class:'note'},'أرسلها إليك تدريسيون كتبوا بريدك بوصفك المسؤول المباشر. افتح القائمة وضع درجات المحاور التي تخصك.'),
+    h('button',{class:'btn',type:'button',onclick:()=>openForm('sup')},'افتح لوحة المسؤول')));
+  out.push(h('p',{class:'note'},'اختر الاستمارة التي تخصك حسب منصبك وصفتك الوظيفية. الاستمارات المعلَّمة «قيد الإعداد» تُضاف تباعاً، ويمكنك الآن الاطلاع على نسختها الأصلية.'));
+  GROUPS.forEach(([g,gt])=>{out.push(h('div',{class:'gsec'},h('h2',null,gt),h('div',{class:'fgrid'},FORMS.filter(f=>f.g===g).map(f=>{
+    const st=f.id?libState[f.id]:null;
+    return h('div',{class:'fcard'+(f.id?' on':'')},h('div',{class:'fno'},'استمارة رقم ('+f.no+')'),h('div',{class:'ft'},f.t),f.w?h('div',{class:'note',style:'margin:0'},f.w):null,
+      h('div',{class:'qrow'},f.id?h('button',{class:'btn sm',type:'button',onclick:()=>openForm()},st==='sent'?'افتح استمارتك (وصلت إلى المسؤول)':st==='saved'?'أكمل استمارتك':'ابدأ الاستمارة'):h('span',{class:'chip'},'قيد الإعداد'),
+        h('a',{class:'linkbtn',href:DRV+f.pdf+'/view',target:'_blank',rel:'noopener'},'الاستمارة الأصلية')))}))))});
+  out.push(h('div',{class:'gsec'},h('h2',null,'وثائق ونماذج مساعدة'),h('ul',{class:'files'},HELPERS.map(([t,id])=>h('li',null,h('a',{class:'linkbtn',href:DRV+id+'/view',target:'_blank',rel:'noopener'},t))))));
+  return h('div',{class:'glib'},out);
+}
+async function openForm(sec){
+  gate.hidden=true;wrapEl.hidden=false;setSave('تُحمَّل استمارتك…');
+  docRef=db.doc('users/'+uid+'/forms/'+FID);assets=null;LS='form10-'+uid;
+  try{const d=await docRef.get();
+    if(d.exists)merge(JSON.parse(JSON.stringify(d.data())));
+    else{S=norm({});LS='form10-'+uid;loadLocal();
+      if(!S.info.name){let old=null;try{old=JSON.parse(localStorage.getItem(LEGACY)||'null')}catch(e){}
+        if(old&&old.info&&confirm('وجدنا استمارة محفوظة على هذا الجهاز من قبل'+(old.info.name?' باسم: '+old.info.name:'')+'.\nهل تريد نقلها إلى حسابك؟')){merge(old);try{localStorage.removeItem(LEGACY)}catch(e){}}}
+      if(!S.info.name&&me.displayName)S.info.name=me.displayName;if(!S.info.email)S.info.email=me.email;flush()}
+    setSave('تم الحفظ في حسابك')}
+  catch(e){S=norm({});setSave('تعذّر تحميل استمارتك. تأكد من الإنترنت ثم حدّث الصفحة.')}
+  try{const r=await db.doc('reviews/'+uid+'_'+FID).get();myReview=r.exists?JSON.parse(JSON.stringify(r.data())):null}catch(e){myReview=null}
+  subSent='';try{const s=await db.doc('subs/'+uid+'_'+FID).get();sentAt=s.exists?s.data().at:null;if(s.exists){const x=s.data();if(!S.info.supEmail)S.info.supEmail=x.sup;subSent=x.sup+'|'+x.name}}catch(e){}
+  cur=sec||'info';supSel=null;people=null;if(cur==='sup')loadPeople();
+  acct();nav();render();refresh();window.scrollTo({top:0});
+}
+function backToLib(){clearTimeout(tmr);if(docRef)flush();docRef=null;S=norm({});enterLib()}
+function acct(){const a=document.getElementById('acct');if(!a)return;
+  a.replaceChildren(...(auth&&me?[h('button',{class:'btn ghost sm',type:'button',onclick:backToLib},'كل الاستمارات'),h('span',{class:'chip',dir:'ltr'},me.email)]:[]))}
+
+/* ---------- الإرسال إلى المسؤول المباشر ---------- */
+async function toCloud(f){
+  if(f.p)return f;
+  const blob=await loadBlob(f);if(!blob)throw M('لم تُعثر على الوثيقة «'+f.name+'» في هذا الجهاز. ارفعها مرة أخرى.');
+  const rec=await storeFile(new File([blob],f.name,{type:f.type||blob.type}));
+  return rec;
+}
+let subSent='',migrating=false;
+const hasSup=()=>AX.some(a=>a.by===SUPBY);
+function subText(){const sup=String(S.info.supEmail||'').trim().toLowerCase();
+  if(!sup)return['اكتب البريد الرسمي لمسؤولك المباشر، فتصل إليه استمارتك تلقائياً.',''];
+  if(!isUom(sup))return['اكتب البريد الرسمي كاملاً، أي البريد الذي ينتهي بـ '+DOMAIN,''];
+  if(sup===myMail())return['هذا بريدك أنت. اكتب بريد مسؤولك المباشر.',''];
+  return subSent.split('|')[0]===sup?['استمارتك تصل تلقائياً إلى مسؤولك المباشر، ويرى كل تعديل تجريه فوراً.','var(--ok)']:['تُرسَل استمارتك إلى المسؤول…','']}
+function paintSub(){const [t,c]=subText();document.querySelectorAll('[data-substat]').forEach(e=>{e.textContent=t;e.style.color=c})}
+async function migrateFiles(){if(migrating)return;migrating=true;
+  try{for(const k in S.files){const a=S.files[k];for(let i=0;i<a.length;i++)if(!a[i].p)a[i]=await toCloud(a[i])}save()}catch(e){}migrating=false}
+async function autoSub(){
+  if(!(auth&&me&&docRef&&hasSup()))return;
+  const sup=String(S.info.supEmail||'').trim().toLowerCase(),name=(S.info.name||me.displayName||'').trim().slice(0,120),key=sup+'|'+name,sid='subs/'+uid+'_'+FID;
+  if(key===subSent){paintSub();return}
+  if(!sup&&subSent){try{await db.doc(sid).delete();subSent='';sentAt=null}catch(e){}paintSub();return}
+  if(!isUom(sup)||sup===myMail()){paintSub();return}
+  try{const at=Date.now();await db.doc(sid).set({uid,form:FID,sup,tEmail:myMail(),name,at});subSent=key;sentAt=at}catch(e){}
+  paintSub();if(Object.values(S.files).some(a=>a.some(f=>!f.p)))migrateFiles();
+}
+function supBox(){
+  if(!(auth&&me&&docRef&&hasSup()))return null;
+  const em=h('input',{class:'txt',type:'email',dir:'ltr',style:'width:100%;max-width:380px',placeholder:'name'+DOMAIN,value:S.info.supEmail||'','aria-label':'البريد الرسمي للمسؤول المباشر',
+    oninput:e=>{S.info.supEmail=e.target.value.trim();paintSub();save()}});
+  const [t,c]=subText();
+  return h('div',{class:'box supbox'},'المسؤول المباشر',
+    h('p',{class:'note'},'في هذه الاستمارة محاور يقيّمها المسؤول المباشر. اكتب بريده الرسمي مرة واحدة، فتصل إليه استمارتك ووثائقك تلقائياً، ويضع درجاته، ثم تُدمج مع باقي المحاور في درجتك النهائية.'),
+    h('label',{class:'gfl'},h('span',null,'البريد الرسمي للمسؤول المباشر'),em),h('div',{class:'err','data-substat':'1',role:'status',style:'color:'+c},t));
+}
+function sendBox(){
+  const [t,c]=subText();
+  const rf=h('button',{class:'btn ghost',type:'button'},'حدّث تقييم المسؤول');
+  rf.onclick=busy(rf,'يُحدَّث…',async()=>{try{const r=await db.doc('reviews/'+uid+'_'+FID).get();myReview=r.exists?JSON.parse(JSON.stringify(r.data())):null}catch(e){}render();refresh()});
+  return h('div',{class:'box'},'تقييم المسؤول المباشر',
+    h('p',{class:'note'},S.info.supEmail?h('span',null,'المسؤول: ',h('span',{dir:'ltr'},S.info.supEmail)):'لم تكتب بريد مسؤولك بعد. اكتبه في «البيانات الرئيسة».'),
+    h('div',{class:'err','data-substat':'1',role:'status',style:'color:'+c},t),
+    myReview?h('p',{class:'note',style:'color:var(--ok)'},'قيّمك المسؤول'+(myReview.byName?' ('+myReview.byName+')':'')+' بتاريخ '+fmtD(myReview.at)+'. درجتك النهائية تشمل تقييمه.'):
+      subSent?h('p',{class:'note'},'لم يقيّمك المسؤول بعد.'):null,
+    subSent?rf:h('button',{class:'btn ghost',type:'button',onclick:()=>go('info')},'اكتب بريد المسؤول'));
+}
+
 /* ---------- لوحة المسؤول ---------- */
 async function loadPeople(){
-  try{const [ps,rs]=await Promise.all([db.collection('people').get(),db.collection('reviews').get()]);
-    const rv={};rs.docs.forEach(d=>{rv[d.id]=JSON.parse(JSON.stringify(d.data()))});
-    people=ps.docs.map(d=>{const x=JSON.parse(JSON.stringify(d.data()));return{id:d.id,name:String(x.name||'بدون اسم'),at:x.at,st:norm(x.form),rev:rv[d.id]||null}});
-  }catch(e){people=[]}
+  const list=inbox.filter(x=>x.form===FID);
+  people=await Promise.all(list.map(async x=>{let st=norm({}),rev=null;
+    try{const d=await db.doc('users/'+x.uid+'/forms/'+FID).get();if(d.exists)st=norm(JSON.parse(JSON.stringify(d.data())))}catch(e){}
+    try{const r=await db.doc('reviews/'+x.id).get();if(r.exists)rev=JSON.parse(JSON.stringify(r.data()))}catch(e){}
+    return{id:x.id,name:String(x.name||'بدون اسم'),mail:x.tEmail||'',at:x.at,st,rev}}));
   if(cur==='sup')render();
 }
+function supItems(a){return a.by===SUPBY}
 function renderSup(){
-  if(!db)return[h('h2',{class:'axis-title'},'لوحة المسؤول'),h('p',{class:'note'},'اللوحة غير متاحة في هذا العرض.')];
-  if(!people)return[h('h2',{class:'axis-title'},'لوحة المسؤول'),h('p',{class:'note'},'تُحمَّل الملفات المرسلة…')];
+  if(!db||!me)return[h('h2',{class:'axis-title'},'لوحة المسؤول'),h('p',{class:'note'},'اللوحة غير متاحة في هذا العرض.')];
+  if(!people)return[h('h2',{class:'axis-title'},'لوحة المسؤول'),h('p',{class:'note'},'تُحمَّل الاستمارات المرسلة إليك…')];
   const p=people.find(x=>x.id===supSel);
-  if(!p)return[h('h2',{class:'axis-title'},'لوحة المسؤول'),
-    h('p',{class:'note'},'هنا ملفات التدريسيين الذين ضغطوا «أرسل ملفي إلى المسؤول». افتح الملف لترى الوثائق وتضع درجاتك. شارك التطبيق مع التدريسيين بصلاحية «مساهم».'),
-    h('button',{class:'btn ghost sm',type:'button',onclick:()=>{people=null;loadPeople();render()}},'حدّث القائمة'),
+  if(!p)return[h('h2',{class:'axis-title'},'لوحة المسؤول المباشر'),
+    h('p',{class:'note'},'هنا استمارات التدريسيين الذين كتبوا بريدك بوصفك مسؤولهم المباشر. افتح الاستمارة لترى الوثائق، وضع درجات المحاور التي يملؤها المسؤول المباشر، ثم احفظ التقييم ليصل إلى التدريسي.'),
+    h('button',{class:'btn ghost sm',type:'button',onclick:async()=>{people=null;render();try{const q=await db.collection('subs').where('sup','==',myMail()).get();
+      inbox=q.docs.map(d=>Object.assign({id:d.id},JSON.parse(JSON.stringify(d.data()))))}catch(e){}loadPeople()}},'حدّث القائمة'),
     people.length?h('div',{class:'box',style:'margin-top:10px'},people.map(x=>{const T=totals(x.st),TR=x.rev?totals(x.st,x.rev.v||{}):null;
-      return h('div',{class:'person'},h('div',null,x.name,h('div',{class:'chip',style:'white-space:normal'},(x.at?'أُرسل '+fmtD(x.at)+'. ':'')+'تقديره الذاتي: '+r2(T.fin)+'. '+(TR?'درجتك: '+r2(TR.fin)+' ('+TR.grade+')':'لم يُقيَّم بعد'))),
-        h('button',{class:'btn sm',type:'button',onclick:()=>{supSel=x.id;R={v:Object.assign({},x.rev&&x.rev.v),note:x.rev&&x.rev.note||''};render();window.scrollTo({top:0})}},'افتح الملف'))})):
-      h('p',{class:'note',style:'margin-top:10px'},'لم يرسل أحد ملفه بعد.')];
+      return h('div',{class:'person'},h('div',null,x.name,h('div',{class:'chip',style:'white-space:normal'},h('span',{dir:'ltr'},x.mail),' . '+(x.at?'أُرسلت '+fmtD(x.at)+'. ':'')+'تقديره الذاتي: '+r2(T.fin)+'. '+(TR?'بعد تقييمك: '+r2(TR.fin)+' ('+TR.grade+')':'لم تقيّمه بعد'))),
+        h('button',{class:'btn sm',type:'button',onclick:()=>{supSel=x.id;R={v:Object.assign({},x.rev&&x.rev.v),note:x.rev&&x.rev.note||''};render();window.scrollTo({top:0})}},'افتح الاستمارة'))})):
+      h('p',{class:'note',style:'margin-top:10px'},'لم يرسل إليك أحد استمارته بعد.')];
   const st=p.st,fin=h('span'),msg=h('div',{class:'err',role:'status'});
   const upd=()=>{const T=totals(st,R.v);fin.textContent=r2(T.fin)+' ('+T.grade+')'};
-  const rin=it=>{const cap=capOf(it,st),mx=isFinite(cap)?cap:999;return h('input',{class:'num',type:'number',min:0,max:mx,step:'any',value:R.v[it.id]??'','aria-label':'درجة المسؤول: '+it.label,
+  const rin=it=>{if(!supItems(it.ax))return h('span',{class:'chip'},'تملؤه '+it.ax.by);
+    const cap=capOf(it,st),mx=isFinite(cap)?cap:999;return h('input',{class:'num',type:'number',min:0,max:mx,step:'any',value:R.v[it.id]??'','aria-label':'درجة المسؤول: '+it.label,
     oninput:e=>{const x=e.target.value;if(x==='')delete R.v[it.id];else R.v[it.id]=Math.max(0,Math.min(mx,+x||0));upd()}})};
   const out=[h('button',{class:'btn ghost sm',type:'button',onclick:()=>{supSel=null;render()}},'رجوع إلى القائمة'),
     h('h2',{class:'axis-title',style:'margin-top:10px'},p.name),
     h('p',{class:'note'},[['inst','المؤسسة'],['title','اللقب العلمي'],['pos','المنصب'],['exact','الاختصاص الدقيق']].filter(x=>st.info[x[0]]).map(x=>x[1]+': '+st.info[x[0]]).join('. ')),
-    h('p',{class:'note'},'الخانة الفارغة تعني اعتماد درجة التدريسي كما هي. اضغط اسم الوثيقة لعرضها.'),
+    h('p',{class:'note'},'تضع درجاتك في محاور المسؤول المباشر فقط. الخانة الفارغة تعني اعتماد درجة التدريسي كما هي. محاور اللجنة العلمية تبقى بدرجة التدريسي. اضغط اسم الوثيقة لعرضها.'),
     h('div',{class:'qrow',style:'margin-bottom:10px'},h('button',{class:'btn ghost sm',type:'button',onclick:()=>{R.v={};render()}},'افرغ درجاتي'),
       (st.files.info||[]).length?h('span',null,'وثائق البيانات: ',st.files.info.map(f=>[fileLink(f),' '])):null)];
   AX.forEach(a=>{out.push(axHead(a),h('table',{class:'form'},
@@ -820,10 +1051,13 @@ function renderSup(){
       h('td',{class:'c','data-l':'الدرجة القصوى'},isFinite(capOf(it,st))?capOf(it,st):'—'),h('td',{class:'c','data-l':'درجة التدريسي'},r2(itemScore(it,st))),h('td',{class:'c','data-l':'درجة المسؤول'},rin(it)))))),
     (st.files[a.id]||[]).length?h('div',{class:'box'},'وثائق داعمة للمحور: ',st.files[a.id].map(f=>[fileLink(f),' '])):null)});
   const note=h('input',{class:'txt',style:'width:100%',type:'text',value:R.note,'aria-label':'ملاحظة المسؤول',placeholder:'ملاحظة للتدريسي (اختياري)',oninput:e=>{R.note=e.target.value}});
-  const sv=h('button',{class:'btn',type:'button',onclick:async()=>{sv.disabled=true;msg.style.color='';
-    try{const rev={v:Object.assign({},R.v),note:R.note.slice(0,500),at:Date.now()};await db.doc('reviews/'+p.id).set(rev);p.rev=rev;msg.style.color='var(--ok)';msg.textContent='حُفظ التقييم. يراه التدريسي في «النتائج النهائية».'}
-    catch(e){msg.textContent='تعذّر حفظ التقييم. أعد المحاولة.'}sv.disabled=false}},'احفظ التقييم');
-  out.push(h('div',{class:'box'},'مجموع الدرجات النهائية بدرجاتك: ',fin,h('div',{style:'margin:8px 0'},note),
+  const sv=h('button',{class:'btn',type:'button'},'احفظ التقييم وأرسله إلى التدريسي');
+  sv.onclick=busy(sv,'يُحفظ…',async()=>{msg.style.color='';msg.textContent='';
+    const v={};for(const k in R.v){const it=ITEMS[k];if(it&&supItems(it.ax))v[k]=R.v[k]}
+    try{const rev={v,note:R.note.slice(0,500),at:Date.now(),by:myMail(),byName:(me.displayName||'').slice(0,120)};await db.doc('reviews/'+p.id).set(rev);p.rev=rev;
+      msg.style.color='var(--ok)';msg.textContent='حُفظ التقييم ووصل إلى التدريسي. يراه مدموجاً مع باقي المحاور في درجته النهائية.'}
+    catch(e){msg.textContent='تعذّر حفظ التقييم. أعد المحاولة.'}});
+  out.push(h('div',{class:'box'},'الدرجة النهائية بعد تقييمك: ',fin,h('div',{style:'margin:8px 0'},note),
     h('div',{class:'qrow'},sv,downloads?h('button',{class:'btn ghost',type:'button',onclick:()=>saveHtml('استمارة-'+safe(p.name)+'.html',officialHtml(st,R.v),msg)},'نزّل استمارته المملوءة'):null),msg));
   upd();return out;
 }
@@ -832,6 +1066,7 @@ function render(){
   const s=secs().find(x=>x.id===cur)||secs()[0];cur=s.id;
   const c=s.ax?renderAxis(s.ax):cur==='info'?renderInfo():cur==='smart'?renderSmart():cur==='docs'?renderDocs():cur==='tips'?renderTips():cur==='sup'?renderSup():renderRes();
   main.replaceChildren(...c.flat(4).filter(Boolean),footer());
+  document.querySelector('.score').hidden=cur==='sup';
 }
 
 /* ---------- التشغيل ---------- */
@@ -844,6 +1079,7 @@ loadLocal();
 try{if(window.indexedDB){assets=localAssets;IDB.open().catch(()=>{assets=null})}}catch(e){}
 downloads=localDownloads;
 nav();render();refresh();setSave('يُحفظ تلقائياً على هذا الجهاز');
+fbInit();
 </script>
 </body>
 </html>
