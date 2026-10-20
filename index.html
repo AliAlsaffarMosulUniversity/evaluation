@@ -146,6 +146,9 @@ nav .n{font-size:.8rem;font-variant-numeric:tabular-nums;white-space:nowrap}
 .acct:empty{display:none}
 .supbox{border:2px solid var(--acc)}
 .role{border-top:1px dotted var(--line);padding:8px 0}
+.role .gfl>span{display:block}
+.role .chip{white-space:normal;display:block;font-weight:400}
+.role .txt{max-width:100%!important;min-width:0}
 .lock{background:var(--mark);border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:0 0 12px;font-size:.92rem}
 table.locked input:disabled,table.locked button:disabled{opacity:.55;cursor:not-allowed}
 .btn.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:var(--paper);color:var(--ink);border:1px solid var(--line)}
@@ -842,15 +845,13 @@ async function saveHtml(name,html,msg){msg.style.color='';msg.textContent='';
   try{await downloads.save({filename:name,data:html});msg.style.color='var(--ok)';msg.textContent='تم تنزيل الاستمارة. افتحها ثم اطبعها.'}
   catch(x){if(x&&x.code==='declined')return;msg.textContent=x&&x.code==='rate_limited'?'نافذة تنزيل مفتوحة. أغلقها ثم أعد المحاولة.':'تعذّر التنزيل في هذا العرض.'}}
 function renderRes(){
-  const T=totals(),msg=h('div',{class:'err',role:'status'}),smsg=h('div',{class:'err',role:'status'});
+  const T=totals(S,myReview&&myReview.v),msg=h('div',{class:'err',role:'status'});
+  const all=auth&&me&&AX.every(supLock),done=formRoles().filter(r=>myRevs[r.k]).length,need=formRoles().length;
   const out=[h('h2',{class:'axis-title'},'النتائج النهائية للتقييم:'),
-    h('p',{class:'note'},myReview?'الدرجة النهائية تشمل تقييم المسؤول المباشر لمحاوره، مع تقديرك الذاتي لمحاور اللجنة العلمية.':'هذه درجة متوقعة من تقديرك الذاتي. الدرجة الرسمية يضعها المسؤول المباشر واللجنة العلمية.'),
+    h('p',{class:'note'},all?(done===need?'اكتمل تقييمك من جميع الجهات. هذه درجتك النهائية.':'قيّمك '+done+' من '+need+' من جهات التقييم. تكتمل درجتك النهائية حين تقيّمك الجهات كلها.'):'هذه درجة متوقعة من تقديرك الذاتي. الدرجة الرسمية يضعها المسؤول المباشر واللجنة العلمية.'),
     auth&&me&&docRef?sendBox():null,
     resultTable(T),h('div',null,'التقدير النهائي للتقييم'),gradeBoxes(T),
     T.capped?h('div',{class:'warn',style:'margin-bottom:12px'},'طُبّق سقف 80 لأن درجة (المحور الثالث/1) صفر.'):null];
-  if(myReview){const TR=totals(S,myReview.v||{});
-    out.push(h('h2',{class:'axis-title'},'تقييم المسؤول المباشر'+(myReview.at?' ('+fmtD(myReview.at)+')':'')),resultTable(TR),gradeBoxes(TR),
-      myReview.note?h('div',{class:'box'},'ملاحظة المسؤول: ',h('span',{style:'font-weight:400'},myReview.note)):null)}
   out.push(h('div',{class:'box'},'الاستمارة المملوءة',
     h('p',{class:'note'},'ملف بشكل الاستمارة الأصلية، فيه بياناتك ودرجاتك وقائمة وثائقك. افتحه واطبعه على ورق A4.'),
     downloads?h('button',{class:'btn',type:'button',onclick:()=>saveHtml('استمارة-التقييم-رقم-10.html',officialHtml(S,myReview&&myReview.v),msg)},'نزّل الاستمارة المملوءة'):null,' ',h('button',{class:'btn ghost',type:'button',onclick:()=>{const w=window.open(URL.createObjectURL(new Blob([officialHtml()],{type:'text/html;charset=utf-8'})),'_blank');if(!w)msg.textContent='منع المتصفح فتح النافذة. استعمل زر التنزيل.'}},'افتحها للطباعة'),msg),h('div',{class:'box'},'أين تُحفظ بياناتي؟',h('p',{class:'note',style:'margin:0'},auth&&me?'بياناتك ووثائقك محفوظة في حسابك، فتفتحها من أي جهاز بعد الدخول. لا يراها أحد غيرك إلا المسؤول الذي ترسل إليه استمارتك.':'كل بياناتك ووثائقك محفوظة على هذا الجهاز وفي هذا المتصفح فقط. إذا مسحت بيانات المتصفح تُحذف. نزّل الملف المضغوط من «الوثائق المرفوعة» ليكون نسخة احتياطية.')));
