@@ -14,7 +14,20 @@ service cloud.firestore {
     function subPath(id) { return /databases/$(database)/documents/subs/$(id); }
     // جهات التقييم: المسؤول المباشر (sup) ورئيس اللجنة العلمية (com)
     function ev(id) { return exists(subPath(id)) && get(subPath(id)).data.sup == me(); }
-    function isSup(u, f) { return ev(u + '_' + f + '_sup') || ev(u + '_' + f + '_com'); }
+    // جهات المصادقة: رئيس القسم (hod) والعميد (dean)
+    function isSup(u, f) {
+      return ev(u + '_' + f + '_sup') || ev(u + '_' + f + '_com')
+          || ev(u + '_' + f + '_hod') || ev(u + '_' + f + '_dean');
+    }
+    function rv(id) { return /databases/$(database)/documents/reviews/$(id); }
+    // ترتيب المراحل: رئيس القسم بعد التقييمين، والعميد بعد رئيس القسم
+    function prereq(id) {
+      let p = id.split('_');
+      let b = p[0] + '_' + p[1];
+      return (p[2] != 'hod' && p[2] != 'dean')
+          || (p[2] == 'hod' && exists(rv(b + '_sup')) && exists(rv(b + '_com')))
+          || (p[2] == 'dean' && exists(rv(b + '_hod')));
+    }
 
     // استمارات التدريسي ووثائقها: يراها صاحبها، والمسؤول الذي أُرسلت إليه
     match /users/{u}/forms/{f} {
@@ -37,10 +50,10 @@ service cloud.firestore {
       allow delete: if ok() && mine(id);
     }
 
-    // التقييم: تكتبه جهة التقييم وحدها، ويقرؤه التدريسي
+    // التقييم والمصادقة: تكتبه كل جهة لنفسها، ويقرؤه التدريسي وبقية جهات السلسلة
     match /reviews/{id} {
-      allow read: if ok() && (mine(id) || (exists(subPath(id)) && get(subPath(id)).data.sup == me()));
-      allow write: if ok() && !mine(id) && exists(subPath(id)) && get(subPath(id)).data.sup == me();
+      allow read: if ok() && (mine(id) || isSup(id.split('_')[0], id.split('_')[1]));
+      allow write: if ok() && !mine(id) && ev(id) && prereq(id);
     }
 
     // أي مسار آخر مغلق

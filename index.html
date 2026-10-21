@@ -146,6 +146,50 @@ nav .n{font-size:.8rem;font-variant-numeric:tabular-nums;white-space:nowrap}
 .acct:empty{display:none}
 .supbox{border:2px solid var(--acc)}
 .role{border-top:1px dotted var(--line);padding:8px 0}
+.apprhead{font-weight:700;margin-top:14px;padding-top:12px;border-top:2px solid var(--line)}
+.subh{font-size:1.05rem;margin:18px 0 10px}
+.stage{font-size:.82rem;font-weight:600;margin-top:6px;color:var(--acc)}
+nav .n.r-sup{background:#FBE3D6;color:#9C3B12;border-radius:999px;padding:0 8px}
+nav .n.r-com{background:#D9EEF8;color:#0A5F86;border-radius:999px;padding:0 8px}
+nav .n.pend{background:transparent;color:var(--muted);border:1px dashed var(--line);font-weight:400}
+.rtag{display:inline-block;margin-inline-start:8px;font-size:.72rem;font-weight:700;border-radius:999px;padding:0 8px;vertical-align:middle}
+tr.rw-sup .rtag{background:#FBE3D6;color:#9C3B12}tr.rw-com .rtag{background:#D9EEF8;color:#0A5F86}
+tr.rw-sup td:first-child{box-shadow:inset -4px 0 0 #D4561C}tr.rw-com td:first-child{box-shadow:inset -4px 0 0 #0E9BD5}
+.tl{list-style:none;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;margin:8px 0 14px;padding:0}
+.tl .st{position:relative;display:grid;justify-items:center;align-content:start;gap:4px;text-align:center;padding:0 4px}
+.tl .st::before{content:"";position:absolute;top:21px;left:50%;width:100%;height:4px;background:var(--line);z-index:0}
+.tl .st:first-child::before{display:none}
+.tl .st.done::before{background:#2FA36B}
+.tl .tdot{position:relative;z-index:1;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:var(--paper);border:3px solid var(--line);color:var(--muted)}
+.tl .done .tdot{background:#2FA36B;border-color:#2FA36B;color:#fff;font-size:1.45rem;box-shadow:0 4px 12px rgba(47,163,107,.35)}
+.tl .now .tdot{border-color:var(--acc);color:var(--acc);box-shadow:0 0 0 5px rgba(47,111,106,.15)}
+.tl b{font-size:.86rem;line-height:1.45}
+.tl small{font-size:.74rem;color:var(--muted);line-height:1.4}
+.tl .now b{color:var(--acc)}
+@media (max-width:700px){
+  .tl{grid-auto-flow:row}
+  .tl .st{grid-template-columns:46px 1fr;justify-items:start;text-align:start;column-gap:12px;min-height:66px;padding:0 0 10px}
+  .tl .st b{grid-column:2;grid-row:1;align-self:center}.tl .st small{grid-column:2;grid-row:2}
+  .tl .tdot{grid-row:1/3}
+  .tl .st::before{left:auto;right:21px;top:-30px;width:4px;height:44px}
+}
+.evc{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-bottom:6px}
+.ev{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--paper)}
+.ev-sup{border-top:5px solid #D4561C}.ev-com{border-top:5px solid #0E9BD5}
+.evh{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:700}
+.evtag{font-size:1rem}
+.ev-sup .evtag{color:#B4461A}.ev-com .evtag{color:#0A7DB0}
+.evok{color:#2FA36B;font-size:.85rem}.evpend{color:var(--muted);font-size:.85rem;font-weight:400}
+.evbig{margin:6px 0 4px}.evbig span{font-size:2.2rem;font-weight:700;font-variant-numeric:tabular-nums}.evbig small{color:var(--muted);font-size:.8rem}
+.ev ul{list-style:none;margin:0;padding:0;font-size:.86rem}
+.ev li{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-top:1px dotted var(--line)}
+.ev li b{white-space:nowrap;font-variant-numeric:tabular-nums}
+.evby{font-size:.78rem;color:var(--muted);margin-top:6px}
+.apprbox{border:2px solid var(--acc)}.apprbox.done{border-color:#2FA36B}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) nav .n.r-sup,:root:not([data-theme="light"]) tr.rw-sup .rtag{background:#4A2414;color:#F6B391}
+  :root:not([data-theme="light"]) nav .n.r-com,:root:not([data-theme="light"]) tr.rw-com .rtag{background:#123A4D;color:#8FD3F2}}
+:root[data-theme="dark"] nav .n.r-sup,:root[data-theme="dark"] tr.rw-sup .rtag{background:#4A2414;color:#F6B391}
+:root[data-theme="dark"] nav .n.r-com,:root[data-theme="dark"] tr.rw-com .rtag{background:#123A4D;color:#8FD3F2}
 .role .gfl>span{display:block}
 .role .chip{white-space:normal;display:block;font-weight:400}
 .role .txt{max-width:100%!important;min-width:0}
@@ -241,6 +285,7 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
       <div>مجموع الدرجات النهائية</div>
       <div class="big" id="fin">0</div>
       <div id="grade">—</div>
+      <div id="stage" class="stage" hidden></div>
       <div class="ruler"><i id="bar"></i>
         <b style="inset-inline-start:70%"></b><span style="inset-inline-start:70%">70</span>
         <b style="inset-inline-start:80%"></b><span style="inset-inline-start:80%">80</span>
@@ -465,13 +510,16 @@ function refresh(){
   document.getElementById('bar').style.width=Math.min(100,T.fin)+'%';
   document.getElementById('cap80').hidden=!T.capped;
   document.querySelectorAll('[data-pts]').forEach(e=>{e.textContent=r2(T.sc(ITEMS[e.dataset.pts]))});
-  document.querySelectorAll('[data-ax]').forEach(e=>{const a=AX.find(x=>x.id===e.dataset.ax);e.textContent=(a.minus&&T.ax(a)?'− ':'')+r2(T.ax(a))});
+  document.querySelectorAll('[data-ax]').forEach(e=>{const a=AX.find(x=>x.id===e.dataset.ax),r=supLock(a)&&roleOf(a);
+    if(r&&!myRevs[r.k]&&e.closest('nav')){e.textContent='بانتظار';e.classList.add('pend');return}
+    e.classList.remove('pend');e.textContent=(a.minus&&T.ax(a)?'− ':'')+r2(T.ax(a))});
+  const sg=document.getElementById('stage');if(sg){const on=!!(auth&&me&&docRef);sg.hidden=!on;if(on)sg.textContent=stageLine(myRevs,submitted())}
   const m=missing().length,nd=document.querySelector('[data-docs]');if(nd)nd.textContent=m?m+' ناقصة':'';
 }
 function nav(){
   const n=document.getElementById('nav');n.replaceChildren(...secs().map(s=>h('button',{type:'button','aria-current':s.id===cur?'true':'false',onclick:()=>go(s.id)},
       h('span',null,s.ax?'المحور '+ORD[AX.indexOf(s.ax)]+': '+s.t:s.t),
-      s.ax?h('span',{class:'n','data-ax':s.id}):s.id==='docs'?h('span',{class:'n','data-docs':'1'}):null)));
+      s.ax?h('span',{class:'n'+(auth&&me&&roleOf(s.ax)?' r-'+roleOf(s.ax).k:''),'data-ax':s.id}):s.id==='docs'?h('span',{class:'n','data-docs':'1'}):null)));
   const c=n.querySelector('[aria-current="true"]');if(c&&c.scrollIntoView&&mob())c.scrollIntoView({inline:'center',block:'nearest'});
 }
 function go(id,itemId){cur=id;if(id==='sup'&&!supSel){people=null;loadPeople()}render();nav();refresh();
@@ -833,7 +881,7 @@ function renderTips(){
 function resultTable(T){
   return h('table',{class:'form'},
     h('thead',null,h('tr',null,h('th',null,'ت'),h('th',null,'المحاور'),h('th',null,'الدرجة الحاصل عليها من المحور'),h('th',null,'وزن المحور'),h('th',null,'الدرجة حسب الوزن'))),
-    h('tbody',null,T.rows.map((r,i)=>h('tr',null,h('td',{class:'c'},i+1),h('td',null,r.a.t),h('td',{class:'c','data-l':'الدرجة'},r2(r.sc)),h('td',{class:'c','data-l':'الوزن'},r.a.w+'%'),h('td',{class:'c','data-l':'حسب الوزن'},r2(r.ws)))),
+    h('tbody',null,T.rows.map((r,i)=>h('tr',{class:roleOf(r.a)&&auth&&me?'rw-'+roleOf(r.a).k:null},h('td',{class:'c'},i+1),h('td',null,r.a.t,roleOf(r.a)&&auth&&me?h('span',{class:'rtag'},evName(roleOf(r.a))):null),h('td',{class:'c','data-l':'الدرجة'},r2(r.sc)),h('td',{class:'c','data-l':'الوزن'},r.a.w+'%'),h('td',{class:'c','data-l':'حسب الوزن'},r2(r.ws)))),
       h('tr',{class:'tot'},h('td'),h('td',null,'مجموع المحاور الخمسة'),h('td'),h('td',{class:'c'},'100%'),h('td',{class:'c'},r2(T.w))),
       h('tr',null,h('td',{class:'c'},6),h('td',null,'مواطن القوة'),h('td'),h('td'),h('td',{class:'c'},r2(T.plus))),
       h('tr',null,h('td',{class:'c'},7),h('td',null,'خصم العقوبات (تخصم بالكامل بدون وزن)'),h('td'),h('td'),h('td',{class:'c'},r2(T.minus))),
@@ -846,11 +894,11 @@ async function saveHtml(name,html,msg){msg.style.color='';msg.textContent='';
   catch(x){if(x&&x.code==='declined')return;msg.textContent=x&&x.code==='rate_limited'?'نافذة تنزيل مفتوحة. أغلقها ثم أعد المحاولة.':'تعذّر التنزيل في هذا العرض.'}}
 function renderRes(){
   const T=totals(S,myReview&&myReview.v),msg=h('div',{class:'err',role:'status'});
-  const all=auth&&me&&AX.every(supLock),done=formRoles().filter(r=>myRevs[r.k]).length,need=formRoles().length;
+  const all=auth&&me&&AX.every(supLock),done=formRoles().filter(r=>myRevs[r.k]).length,need=formRoles().length,fullOk=APPR.every(r=>myRevs[r.k]&&myRevs[r.k].approved);
   const out=[h('h2',{class:'axis-title'},'النتائج النهائية للتقييم:'),
-    h('p',{class:'note'},all?(done===need?'اكتمل تقييمك من جميع الجهات. هذه درجتك النهائية.':'قيّمك '+done+' من '+need+' من جهات التقييم. تكتمل درجتك النهائية حين تقيّمك الجهات كلها.'):'هذه درجة متوقعة من تقديرك الذاتي. الدرجة الرسمية يضعها المسؤول المباشر واللجنة العلمية.'),
+    h('p',{class:'note'},all?(done===need?(fullOk?'اكتمل تقييمك وصادق عليه رئيس القسم والعميد. هذه درجتك النهائية المعتمدة.':'اكتمل تقييمك من جهتي التقييم، وهو الآن في مرحلة المصادقة.'):'قيّمك '+done+' من '+need+' من جهات التقييم. تكتمل درجتك النهائية حين تقيّمك الجهات كلها.'):'هذه درجة متوقعة من تقديرك الذاتي. الدرجة الرسمية يضعها المسؤول المباشر واللجنة العلمية.'),
     auth&&me&&docRef?sendBox():null,
-    resultTable(T),h('div',null,'التقدير النهائي للتقييم'),gradeBoxes(T),
+    h('h3',{class:'subh'},'جدول الدرجة النهائية'),resultTable(T),h('div',null,'التقدير النهائي للتقييم'),gradeBoxes(T),
     T.capped?h('div',{class:'warn',style:'margin-bottom:12px'},'طُبّق سقف 80 لأن درجة (المحور الثالث/1) صفر.'):null];
   out.push(h('div',{class:'box'},'الاستمارة المملوءة',
     h('p',{class:'note'},'ملف بشكل الاستمارة الأصلية، فيه بياناتك ودرجاتك وقائمة وثائقك. افتحه واطبعه على ورق A4.'),
@@ -858,7 +906,8 @@ function renderRes(){
   return out;
 }
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function officialHtml(st=S,ov){
+function officialHtml(st=S,ov,revs){
+  revs=revs||(st===S?myRevs:{})||{};
   const T=totals(st,ov),I=st.info,d=k=>'<span class="d">'+esc(I[k])+'</span>';let b='';
   b+='<div class="oh"><div>وزارة التعليم العالي والبحث العلمي<br>جهاز الإشراف والتقويم العلمي<br>دائرة ضمان الجودة والاعتماد الأكاديمي<br>قسم تقويم الأداء المؤسسي</div><div>رقم الاستمارة: '+d('formNo')+'<br>ترميز الاستمارة: '+d('formCode')+'</div></div>';
   b+='<div class="ot"><h1>استمارة رقم (10): الملف التقويمي لأداء التدريسي الإداري في الجامعات والكليات للعام الدراسي 2025-2026</h1><p>ملاحظة: تشمل هذه الاستمارة معاوني العمداء ورؤساء الأقسام العلمية والإدارية ومقرري الأقسام والفروع (الدراسات الأولية الصباحية والمسائية والدراسات العليا) ومسؤولي الشعب والوحدات</p></div>';
@@ -882,7 +931,11 @@ function officialHtml(st=S,ov){
     '<tr><td class="c">7</td><td>خصم العقوبات</td><td colspan="2" class="c">تخصم بالكامل بدون وزن</td><td class="c">'+r2(T.minus)+'</td></tr>'+
     '<tr class="t"><td></td><td>مجموع الدرجات النهائية للتقييم</td><td colspan="2" class="c">الدرجة رقماً</td><td class="c">'+r2(T.fin)+'</td></tr></table>'+
     '<p>التقدير النهائي للتقييم</p><table><tr>'+[['امتياز','90 فأكثر'],['جيد جداً','89-80'],['جيد','79-70'],['ضعيف','أقل من 70']].map(g=>'<td class="c'+(g[0]===T.grade?' on':'')+'">'+g[0]+'<br>'+g[1]+'</td>').join('')+'</tr></table>'+
-    '<div class="sg"><div>اسم المسؤول المباشر:<br>التوقيع:<br>التاريخ:</div><div>اسم المسؤول الأعلى:<br>التوقيع:<br>التاريخ:</div></div>';
+    (()=>{const nm=k=>esc((revs[k]&&(revs[k].byName||revs[k].by))||''),dt=k=>revs[k]&&revs[k].at?fmtD(revs[k].at):'';
+      const chain=stages(revs,true).slice(1);
+      return '<div class="sg"><div>اسم المسؤول المباشر: '+nm('sup')+'<br>التوقيع:<br>التاريخ: '+dt('sup')+'</div><div>اسم المسؤول الأعلى: '+nm('dean')+'<br>التوقيع:<br>التاريخ: '+dt('dean')+'</div></div>'+
+        '<h2>مسار التقييم والمصادقة الإلكتروني</h2><table><tr><th>المرحلة</th><th>الاسم</th><th>البريد</th><th>التاريخ</th><th>الحالة</th></tr>'+
+        chain.map(x=>'<tr><td>'+x.t+'</td><td>'+esc(x.rv&&x.rv.byName||'')+'</td><td class="n" dir="ltr">'+esc(x.rv&&x.rv.by||'')+'</td><td class="c">'+(x.rv&&x.rv.at?fmtD(x.rv.at):'')+'</td><td class="c">'+(x.done?'✓ تم':'بانتظار')+'</td></tr>').join('')+'</table>'})();
   const fk=Object.keys(st.files||{}).filter(k=>st.files[k].length);
   if(fk.length)b+='<h2 class="pb">ملحق: قائمة الوثائق المرفقة</h2><table><tr><th>الفقرة</th><th>الوثائق</th></tr>'+fk.map(k=>'<tr><td>'+esc(keyName(k))+'</td><td class="n">'+st.files[k].map(f=>esc(f.name)).join('<br>')+'</td></tr>').join('')+'</table>';
   return '<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>استمارة رقم 10</title><style>@page{size:A4;margin:12mm}body{font-family:Arial,"Simplified Arabic",Tahoma,sans-serif;font-weight:700;font-size:12.5px;line-height:1.6;color:#000;max-width:190mm;margin:10px auto}h1{font-size:16px;margin:0}h2{font-size:14px;margin:14px 0 6px}p{margin:6px 0}.oh{display:flex;justify-content:space-between}.oh div:first-child{text-align:center}.ot{border:2px solid #000;border-radius:20px;text-align:center;padding:6px 12px;margin:10px 0}.ot p{font-size:11px;margin:3px 0 0}.d{display:inline-block;min-width:110px;border-bottom:1.5px dotted #000;font-weight:400;padding:0 6px}table{border-collapse:collapse;width:100%;border:2px solid #000;margin:4px 0 8px}th{background:#D9D9D9}th,td{border:1px solid #000;padding:3px 6px;vertical-align:middle}.c{text-align:center}.n{font-weight:400}.t td{background:#D9D9D9}.on{background:#000;color:#fff}.sg{display:flex;justify-content:space-between;margin-top:24px;line-height:2.4}.pb{page-break-before:always}tr{page-break-inside:avoid}@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body>'+b+'</body></html>';
@@ -951,7 +1004,7 @@ async function enterLib(){
   await reloadInbox();
   isAdmin=inbox.length>0;
   try{const d=await db.doc('users/'+uid+'/forms/'+FID).get();libState[FID]=d.exists?'saved':'';
-    for(const r of ROLES){const s=await db.doc('subs/'+subId(r)).get();if(s.exists){libState[FID]='sent';break}}}catch(e){}
+    for(const r of ROLES.concat(APPR)){const s=await db.doc('subs/'+subId(r)).get();if(s.exists){libState[FID]='sent';break}}}catch(e){}
   if(gateView==='lib')renderGate();
 }
 async function gSignIn(msg){
@@ -1034,8 +1087,8 @@ function renderLib(){
       h('button',{class:'btn ghost sm',type:'button',onclick:()=>{gateView='login';auth.signOut()}},'خروج'))));
   const out=[];
   const mine=inbox.filter(x=>x.form===FID);
-  if(mine.length)out.push(h('section',{class:'inbox'},h('h2',null,'استمارات وصلتك لتقييمها ('+mine.length+')'),
-    h('p',{class:'note',style:'margin:0'},'أرسلها إليك تدريسيون كتبوا بريدك بوصفك مسؤولهم المباشر أو رئيس لجنتهم العلمية. افتح اللوحة وضع درجات المحاور التي تخص صفتك.'),
+  if(mine.length)out.push(h('section',{class:'inbox'},h('h2',null,'استمارات وصلتك للتقييم أو المصادقة ('+mine.length+')'),
+    h('p',{class:'note',style:'margin:0'},'أرسلها إليك تدريسيون كتبوا بريدك بوصفك مسؤولهم المباشر، أو رئيس لجنتهم العلمية، أو رئيس القسم، أو العميد. افتح اللوحة لتقيّم أو تصادق حسب صفتك.'),
     h('div',null,h('button',{class:'btn',type:'button',onclick:()=>openForm('sup')},'افتح لوحة التقييم'))));
   out.push(h('p',{class:'intro'},'اختر الاستمارة التي تخصك حسب منصبك وصفتك الوظيفية. الاستمارات المعلَّمة «قيد الإعداد» تُضاف تباعاً، وتستطيع الآن الاطلاع على نسختها الأصلية.'));
   GROUPS.forEach(([g,gt])=>{out.push(h('section',{class:'gsec'},h('h2',null,gt),h('div',{class:'fgrid'},FORMS.filter(f=>f.g===g).map(f=>{
@@ -1059,7 +1112,7 @@ async function openForm(sec){
     setSave('تم الحفظ في حسابك')}
   catch(e){S=norm({});setSave('تعذّر تحميل استمارتك. تأكد من الإنترنت ثم حدّث الصفحة.')}
   try{await db.doc('subs/'+uid+'_'+FID).delete()}catch(e){}
-  sent={};await Promise.all(formRoles().map(async r=>{try{const d=await db.doc('subs/'+subId(r)).get();if(d.exists){const x=d.data();if(!S.info[r.f])S.info[r.f]=x.sup;sent[r.k]=x.sup+'|'+x.name}}catch(e){}}));
+  sent={};await Promise.all(allRoles().map(async r=>{try{const d=await db.doc('subs/'+subId(r)).get();if(d.exists){const x=d.data();if(!S.info[r.f])S.info[r.f]=x.sup;sent[r.k]=x.sup+'|'+x.name}}catch(e){}}));
   await loadRevs();autoSub();
   cur=sec||'info';supSel=null;people=null;if(cur==='sup')loadPeople();
   acct();nav();render();refresh();window.scrollTo({top:0});
@@ -1081,18 +1134,47 @@ const roleOf=a=>ROLES.find(r=>r.by===a.by);
 const formRoles=()=>ROLES.filter(r=>AX.some(a=>a.by===r.by));
 const subId=(r,u=uid)=>u+'_'+FID+'_'+r.k;
 const roleAxes=r=>AX.filter(a=>a.by===r.by).map(a=>'('+ORD[AX.indexOf(a)]+')').join(' ');
+/* ---------- المصادقة والخط الزمني ---------- */
+const APPR=[{k:'hod',who:'رئيس القسم',to:'لرئيس القسم',f:'hodEmail',appr:true},{k:'dean',who:'العميد',to:'للعميد',f:'deanEmail',appr:true}];
+const allRoles=()=>formRoles().concat(APPR);
+const anyRole=k=>ROLES.concat(APPR).find(r=>r.k===k)||ROLES[0];
+const evName=r=>r.k==='com'?'اللجنة العلمية':r.who;
+const submitted=()=>formRoles().some(r=>sent[r.k]);
+function stages(revs,sub){
+  const s=[{t:'تقديم الاستمارة',done:!!sub}];
+  formRoles().forEach(r=>s.push({t:'تقييم '+evName(r),done:!!revs[r.k],rv:revs[r.k],k:r.k}));
+  APPR.forEach(r=>s.push({t:'مصادقة '+r.who,done:!!(revs[r.k]&&revs[r.k].approved),rv:revs[r.k],k:r.k}));
+  return s}
+function stageLine(revs,sub){const s=stages(revs,sub),i=s.findIndex(x=>!x.done);return i<0?'✓ اكتملت المصادقة على استمارتك':'المرحلة الحالية: '+s[i].t}
+function timeline(revs,sub){
+  const s=stages(revs,sub),ci=s.findIndex(x=>!x.done);
+  return h('ol',{class:'tl','aria-label':'مسار الاستمارة'},s.map((x,i)=>h('li',{class:'st'+(x.done?' done':i===ci?' now':'')},
+    h('span',{class:'tdot','aria-hidden':'true'},x.done?'✓':String(i+1)),
+    h('b',null,x.t),
+    h('small',null,x.done?(x.rv?[x.rv.byName||x.rv.by||'',x.rv.at?h('br'):null,x.rv.at?fmtD(x.rv.at):'']:'تم'):i===ci?'المرحلة الحالية':'بانتظار'))))}
+function axGot(a,st,v){const x=Math.min(a.cap,axItems(a,st).reduce((t,i)=>t+Math.max(0,+v[i.id]||0),0));return x}
+function roleMax(r){let m=0;AX.filter(a=>a.by===r.by&&!a.minus).forEach(a=>{m+=a.w?a.cap*a.w/100:a.cap});return r2(m)}
+function evalCards(st,revs){
+  return h('div',{class:'evc'},formRoles().map(r=>{const rv=revs[r.k],v=(rv&&rv.v)||{};
+    return h('section',{class:'ev ev-'+r.k},
+      h('div',{class:'evh'},h('span',{class:'evtag'},evName(r)),rv?h('span',{class:'evok'},'✓ تم التقييم'):h('span',{class:'evpend'},'بانتظار التقييم')),
+      h('div',{class:'evbig'},h('span',null,rv?r2(partial(st,v,r)):'—'),h('small',null,' من '+roleMax(r)+' درجة في الدرجة النهائية')),
+      h('ul',null,AX.filter(a=>a.by===r.by).map(a=>h('li',null,h('span',null,'المحور '+ORD[AX.indexOf(a)]+': '+a.t),
+        h('b',null,rv?(a.minus?(axGot(a,st,v)?'− '+r2(axGot(a,st,v)):'0'):r2(axGot(a,st,v))+' / '+a.cap):'—')))),
+      rv?h('div',{class:'evby'},(rv.byName||rv.by||'')+'، '+fmtD(rv.at),rv.note?h('div',null,'ملاحظته: '+rv.note):null):null)}))}
+
 function subText(r){const e=String(S.info[r.f]||'').trim().toLowerCase();
   if(!e)return['اكتب البريد الرسمي '+r.to+'، فتصل إليه استمارتك تلقائياً.',''];
   if(!isUom(e))return['اكتب البريد الرسمي كاملاً، أي البريد الذي ينتهي بـ '+DOMAIN,''];
   if(e===myMail())return['هذا بريدك أنت. اكتب بريد '+r.who+'.',''];
-  return (sent[r.k]||'').split('|')[0]===e?['تصل استمارتك تلقائياً إلى '+r.who+'، ويرى كل تعديل تجريه فوراً.','var(--ok)']:['تُرسَل استمارتك…','']}
-function paintSub(){formRoles().forEach(r=>{const [t,c]=subText(r);document.querySelectorAll('[data-substat="'+r.k+'"]').forEach(e=>{e.textContent=t;e.style.color=c})})}
+  return (sent[r.k]||'').split('|')[0]===e?(r.appr?['تنتقل استمارتك تلقائياً إلى '+r.who+' للمصادقة '+(r.k==='hod'?'بعد اكتمال التقييم.':'بعد مصادقة رئيس القسم.'),'var(--ok)']:['تصل استمارتك تلقائياً إلى '+r.who+'، ويرى كل تعديل تجريه فوراً.','var(--ok)']):['تُرسَل استمارتك…','']}
+function paintSub(){allRoles().forEach(r=>{const [t,c]=subText(r);document.querySelectorAll('[data-substat="'+r.k+'"]').forEach(e=>{e.textContent=t;e.style.color=c})})}
 async function migrateFiles(){if(migrating)return;migrating=true;
   try{for(const k in S.files){const a=S.files[k];for(let i=0;i<a.length;i++)if(!a[i].p)a[i]=await toCloud(a[i])}save()}catch(e){}migrating=false}
 async function autoSub(){
   if(!(auth&&me&&docRef))return;
   const name=(S.info.name||me.displayName||'').trim().slice(0,120);let any=false;
-  for(const r of formRoles()){
+  for(const r of allRoles()){
     const e=String(S.info[r.f]||'').trim().toLowerCase(),key=e+'|'+name,sid='subs/'+subId(r);
     if(key===(sent[r.k]||''))continue;
     if(!e&&sent[r.k]){try{await db.doc(sid).delete();delete sent[r.k]}catch(x){}continue}
@@ -1102,28 +1184,30 @@ async function autoSub(){
   paintSub();if(any&&Object.values(S.files).some(a=>a.some(f=>!f.p)))migrateFiles();
 }
 async function loadRevs(){myRevs={};
-  await Promise.all(formRoles().map(async r=>{try{const d=await db.doc('reviews/'+subId(r)).get();if(d.exists)myRevs[r.k]=JSON.parse(JSON.stringify(d.data()))}catch(e){}}));
+  await Promise.all(allRoles().map(async r=>{try{const d=await db.doc('reviews/'+subId(r)).get();if(d.exists)myRevs[r.k]=JSON.parse(JSON.stringify(d.data()))}catch(e){}}));
   const v={};Object.values(myRevs).forEach(x=>Object.assign(v,x.v||{}));myReview=Object.keys(myRevs).length?{v}:null}
+function roleField(r,chip){const [t,c]=subText(r);
+  return h('div',{class:'role'},h('label',{class:'gfl'},h('span',null,'البريد الرسمي '+r.to,h('span',{class:'chip'},chip)),
+    h('input',{class:'txt',type:'email',dir:'ltr',style:'width:100%;max-width:380px',placeholder:'name'+DOMAIN,value:S.info[r.f]||'','aria-label':'البريد الرسمي '+r.to,
+      oninput:e=>{S.info[r.f]=e.target.value.trim();paintSub();save()}})),
+    h('div',{class:'err','data-substat':r.k,role:'status',style:'color:'+c},t))}
 function supBox(){
   if(!(auth&&me&&docRef))return null;const rs=formRoles();if(!rs.length)return null;
   return h('div',{class:'box supbox'},'جهات التقييم',
     h('p',{class:'note'},'محاور هذه الاستمارة يقيّمها غيرك، فهي مقفلة أمامك. اكتب البريد الرسمي لكل جهة مرة واحدة، فتصل إليها استمارتك ووثائقك تلقائياً، وتضع درجاتها، ثم تُدمج الدرجات كلها في درجتك النهائية. عليك أنت ملء البيانات الرئيسة ورفع الوثائق الداعمة.'),
-    rs.map(r=>{const [t,c]=subText(r);
-      return h('div',{class:'role'},h('label',{class:'gfl'},h('span',null,'البريد الرسمي '+r.to,h('span',{class:'chip'},' يقيّم المحاور: '+roleAxes(r))),
-        h('input',{class:'txt',type:'email',dir:'ltr',style:'width:100%;max-width:380px',placeholder:'name'+DOMAIN,value:S.info[r.f]||'','aria-label':'البريد الرسمي '+r.to,
-          oninput:e=>{S.info[r.f]=e.target.value.trim();paintSub();save()}})),
-        h('div',{class:'err','data-substat':r.k,role:'status',style:'color:'+c},t))}));
+    rs.map(r=>roleField(r,' يقيّم المحاور: '+roleAxes(r))),
+    h('div',{class:'apprhead'},'جهات المصادقة'),
+    h('p',{class:'note'},'بعد اكتمال التقييم تنتقل استمارتك تلقائياً إلى رئيس القسم للمصادقة، ثم إلى العميد. تتابع ذلك في «النتائج النهائية».'),
+    APPR.map(r=>roleField(r,r.k==='hod'?' يصادق بعد اكتمال التقييم':' يصادق بعد رئيس القسم')));
 }
 function sendBox(){
-  const rf=h('button',{class:'btn ghost',type:'button'},'حدّث التقييمات');
+  const rf=h('button',{class:'btn ghost',type:'button'},'حدّث الحالة');
   rf.onclick=busy(rf,'يُحدَّث…',async()=>{await loadRevs();render();refresh()});
-  return h('div',{class:'box'},'جهات التقييم',
-    formRoles().map(r=>{const [t,c]=subText(r),rv=myRevs[r.k];
-      return h('div',{class:'role'},h('div',null,r.who+(S.info[r.f]?': ':''),S.info[r.f]?h('span',{dir:'ltr'},S.info[r.f]):null),
-        h('div',{class:'err','data-substat':r.k,role:'status',style:'color:'+c},t),
-        rv?h('div',{class:'note',style:'color:var(--ok)'},'قيّمك'+(rv.byName?' ('+rv.byName+')':'')+' بتاريخ '+fmtD(rv.at)+'.'+(rv.note?' ملاحظته: '+rv.note:'')):
-          sent[r.k]?h('div',{class:'note'},'لم يقيّمك بعد.'):null)}),
-    h('div',{class:'qrow',style:'margin-top:8px'},rf,h('button',{class:'btn ghost',type:'button',onclick:()=>go('info')},'عدّل بريد جهات التقييم')));
+  const miss=allRoles().filter(r=>!isUom(S.info[r.f]));
+  return [h('div',{class:'box'},'مسار استمارتك',timeline(myRevs,submitted()),
+      miss.length?h('div',{class:'warn',style:'margin:0 0 10px'},'لم تكتب بريد: '+miss.map(r=>r.who).join('، ')+'. اكتبه في «البيانات الرئيسة» لتكتمل الدورة.'):null,
+      h('div',{class:'qrow'},rf,h('button',{class:'btn ghost',type:'button',onclick:()=>go('info')},'عدّل بريد الجهات'))),
+    h('h3',{class:'subh'},'درجات جهات التقييم'),evalCards(S,myRevs)];
 }
 
 /* ---------- لوحة التقييم (المسؤول المباشر ورئيس اللجنة العلمية) ---------- */
@@ -1133,22 +1217,44 @@ async function loadPeople(){
   const list=inbox.filter(x=>x.form===FID);
   people=await Promise.all(list.map(async x=>{let st=norm({}),rev=null;
     try{const d=await db.doc('users/'+x.uid+'/forms/'+FID).get();if(d.exists)st=norm(JSON.parse(JSON.stringify(d.data())))}catch(e){}
-    try{const r=await db.doc('reviews/'+x.id).get();if(r.exists)rev=JSON.parse(JSON.stringify(r.data()))}catch(e){}
-    return{id:x.id,role:ROLES.find(r=>r.k===x.role)||ROLES[0],name:String(x.name||'بدون اسم'),mail:x.tEmail||'',at:x.at,st,rev}}));
+    const revs={};await Promise.all(['sup','com','hod','dean'].map(async k=>{try{const r=await db.doc('reviews/'+x.uid+'_'+FID+'_'+k).get();if(r.exists)revs[k]=JSON.parse(JSON.stringify(r.data()))}catch(e){}}));
+    rev=revs[x.role]||null;
+    return{id:x.id,role:anyRole(x.role),name:String(x.name||'بدون اسم'),mail:x.tEmail||'',at:x.at,st,rev,revs}}));
   if(cur==='sup')render();
 }
 function partial(st,v,role){let s=0;AX.filter(a=>a.by===role.by).forEach(a=>{const x=Math.min(a.cap,axItems(a,st).reduce((t,i)=>t+Math.max(0,+v[i.id]||0),0));s+=a.minus?-x:(a.w?x*a.w/100:x)});return r2(s)}
+function canAppr(p){return p.role.k==='hod'?formRoles().every(r=>p.revs[r.k]):p.role.k==='dean'?!!(p.revs.hod&&p.revs.hod.approved):true}
+function renderApprove(p){
+  const st=p.st,role=p.role,v={};formRoles().forEach(r=>Object.assign(v,(p.revs[r.k]||{}).v||{}));
+  const T=totals(st,v),msg=h('div',{class:'err',role:'status'}),ok=canAppr(p),done=!!(p.rev&&p.rev.approved);
+  const note=h('input',{class:'txt',style:'width:100%',type:'text',value:R.note,'aria-label':'ملاحظة',placeholder:'ملاحظة (اختياري)',oninput:e=>{R.note=e.target.value}});
+  const ap=h('button',{class:'btn',type:'button',disabled:!ok||done},done?'✓ تمت مصادقتك':'صادق على الاستمارة');
+  ap.onclick=busy(ap,'يُصادَق…',async()=>{msg.style.color='';msg.textContent='';
+    try{const rev={approved:true,role:role.k,note:R.note.slice(0,500),at:Date.now(),by:myMail(),byName:(me.displayName||'').slice(0,120)};
+      await db.doc('reviews/'+p.id).set(rev);p.rev=rev;p.revs[role.k]=rev;render();window.scrollTo({top:0})}
+    catch(e){msg.textContent='تعذّرت المصادقة. أعد المحاولة.'}});
+  return [h('button',{class:'btn ghost sm',type:'button',onclick:()=>{supSel=null;render()}},'رجوع إلى القائمة'),
+    h('h2',{class:'axis-title',style:'margin-top:10px'},p.name),
+    h('div',{class:'lock'},'تصادق بصفتك: '+role.who+'. راجع درجات جهتي التقييم والدرجة النهائية، ثم صادق. '+(role.k==='hod'?'تُفتح المصادقة بعد أن يقيّم المسؤول المباشر واللجنة العلمية.':'تُفتح المصادقة بعد مصادقة رئيس القسم.')),
+    h('div',{class:'box'},'مسار الاستمارة',timeline(p.revs,true)),
+    h('h3',{class:'subh'},'درجات جهات التقييم'),evalCards(st,p.revs),
+    h('h3',{class:'subh'},'جدول الدرجة النهائية'),resultTable(T),gradeBoxes(T),
+    h('div',{class:'box apprbox'+(done?' done':'')},done?'صادقت على هذه الاستمارة بتاريخ '+fmtD(p.rev.at)+'.':ok?'الاستمارة جاهزة لمصادقتك.':'لم تكتمل المرحلة السابقة بعد، فالمصادقة غير متاحة الآن.',
+      done?null:h('div',{style:'margin:8px 0'},note),h('div',{class:'qrow'},ap,
+        downloads?h('button',{class:'btn ghost',type:'button',onclick:()=>saveHtml('استمارة-'+safe(p.name)+'.html',officialHtml(st,v,p.revs),msg)},'نزّل استمارته المملوءة'):null),msg)];
+}
 function renderSup(){
   if(!db||!me)return[h('h2',{class:'axis-title'},'لوحة التقييم'),h('p',{class:'note'},'اللوحة غير متاحة في هذا العرض.')];
   if(!people)return[h('h2',{class:'axis-title'},'لوحة التقييم'),h('p',{class:'note'},'تُحمَّل الاستمارات المرسلة إليك…')];
   const p=people.find(x=>x.id===supSel);
   if(!p)return[h('h2',{class:'axis-title'},'لوحة التقييم'),
-    h('p',{class:'note'},'هنا استمارات التدريسيين الذين كتبوا بريدك بوصفك مسؤولهم المباشر أو رئيس لجنتهم العلمية. افتح الاستمارة، واطّلع على الوثائق، وضع درجات المحاور التي تخص صفتك، ثم احفظ التقييم ليصل إلى التدريسي.'),
+    h('p',{class:'note'},'هنا استمارات التدريسيين الذين كتبوا بريدك. إن كنت مسؤولهم المباشر أو رئيس لجنتهم العلمية فضع درجات محاورك. وإن كنت رئيس القسم أو العميد فراجع الاستمارة وصادق عليها حين يحين دورك.'),
     h('button',{class:'btn ghost sm',type:'button',onclick:async()=>{people=null;render();await reloadInbox();loadPeople()}},'حدّث القائمة'),
     people.length?h('div',{class:'box',style:'margin-top:10px'},people.map(x=>
-      h('div',{class:'person'},h('div',null,x.name,h('div',{class:'chip',style:'white-space:normal'},'بصفتك: '+x.role.who+' . ',h('span',{dir:'ltr'},x.mail),' . '+(x.at?'وصلت '+fmtD(x.at)+'. ':'')+(x.rev?'قيّمته بتاريخ '+fmtD(x.rev.at):'لم تقيّمه بعد'))),
-        h('button',{class:'btn sm',type:'button',onclick:()=>{supSel=x.id;R={v:Object.assign({},x.rev&&x.rev.v),note:x.rev&&x.rev.note||''};render();window.scrollTo({top:0})}},'افتح الاستمارة')))):
+      h('div',{class:'person'},h('div',null,x.name,h('div',{class:'chip',style:'white-space:normal'},'بصفتك: '+x.role.who+'، ',h('span',{dir:'ltr'},x.mail),'، '+(x.role.appr?(x.rev&&x.rev.approved?'صادقت بتاريخ '+fmtD(x.rev.at):canAppr(x)?'جاهزة لمصادقتك':'بانتظار '+(x.role.k==='hod'?'اكتمال التقييم':'مصادقة رئيس القسم')):(x.rev?'قيّمته بتاريخ '+fmtD(x.rev.at):'لم تقيّمه بعد')))),
+        h('button',{class:'btn sm',type:'button',onclick:()=>{supSel=x.id;R={v:Object.assign({},x.rev&&x.rev.v),note:x.rev&&x.rev.note||''};render();window.scrollTo({top:0})}},x.role.appr?'افتح للمصادقة':'افتح الاستمارة')))):
       h('p',{class:'note',style:'margin-top:10px'},'لم يرسل إليك أحد استمارته بعد.')];
+  if(p.role.appr)return renderApprove(p);
   const st=p.st,role=p.role,fin=h('span'),msg=h('div',{class:'err',role:'status'});
   const upd=()=>{fin.textContent=partial(st,R.v,role)};
   const mine=a=>a.by===role.by;
