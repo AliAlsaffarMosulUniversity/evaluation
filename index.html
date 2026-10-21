@@ -151,6 +151,11 @@ nav .n{font-size:.8rem;font-variant-numeric:tabular-nums;white-space:nowrap}
 .stage{font-size:.82rem;font-weight:600;margin-top:6px;color:var(--acc)}
 nav .n.r-sup{background:#FBE3D6;color:#9C3B12;border-radius:999px;padding:0 8px}
 nav .n.r-com{background:#D9EEF8;color:#0A5F86;border-radius:999px;padding:0 8px}
+.nlab{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+.nlab .by{display:inline-block;font-size:.72rem;font-weight:700;border-radius:6px;padding:0 7px;line-height:1.7}
+.nlab .by-sup{background:#FBE3D6;color:#9C3B12}.nlab .by-com{background:#D9EEF8;color:#0A5F86}.nlab .by-x{background:var(--hd);color:var(--muted)}
+:root[data-theme="dark"] .nlab .by-sup{background:#4A2414;color:#F6B391}:root[data-theme="dark"] .nlab .by-com{background:#123A4D;color:#8FD3F2}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .nlab .by-sup{background:#4A2414;color:#F6B391}:root:not([data-theme="light"]) .nlab .by-com{background:#123A4D;color:#8FD3F2}}
 nav .n.pend{background:transparent;color:var(--muted);border:1px dashed var(--line);font-weight:400}
 .rtag{display:inline-block;margin-inline-start:8px;font-size:.72rem;font-weight:700;border-radius:999px;padding:0 8px;vertical-align:middle}
 tr.rw-sup .rtag{background:#FBE3D6;color:#9C3B12}tr.rw-com .rtag{background:#D9EEF8;color:#0A5F86}
@@ -518,7 +523,7 @@ function refresh(){
 }
 function nav(){
   const n=document.getElementById('nav');n.replaceChildren(...secs().map(s=>h('button',{type:'button','aria-current':s.id===cur?'true':'false',onclick:()=>go(s.id)},
-      h('span',null,s.ax?'المحور '+ORD[AX.indexOf(s.ax)]+': '+s.t:s.t),
+      s.ax?h('span',{class:'nlab'},h('small',{class:'by by-'+((roleOf(s.ax)||{}).k||'x')},'يقيّمه: '+(s.ax.by==='اللجنة العلمية'?'اللجنة العلمية':s.ax.by)),'المحور '+ORD[AX.indexOf(s.ax)]+': '+s.t):h('span',null,s.t),
       s.ax?h('span',{class:'n'+(auth&&me&&roleOf(s.ax)?' r-'+roleOf(s.ax).k:''),'data-ax':s.id}):s.id==='docs'?h('span',{class:'n','data-docs':'1'}):null)));
   const c=n.querySelector('[aria-current="true"]');if(c&&c.scrollIntoView&&mob())c.scrollIntoView({inline:'center',block:'nearest'});
 }
