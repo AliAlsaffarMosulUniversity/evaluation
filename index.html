@@ -955,7 +955,7 @@ async function enterLib(){
   if(gateView==='lib')renderGate();
 }
 async function gSignIn(msg){
-  const pr=new firebase.auth.GoogleAuthProvider();pr.setCustomParameters({hd:'uomosul.edu.iq',prompt:'select_account'});
+  const pr=new firebase.auth.GoogleAuthProvider();pr.setCustomParameters({hd:'uomosul.edu.iq'});
   try{await auth.signInWithPopup(pr)}
   catch(x){const c=x&&x.code;
     if(c==='auth/popup-blocked'||c==='auth/operation-not-supported-in-environment'){await auth.signInWithRedirect(pr);return}
